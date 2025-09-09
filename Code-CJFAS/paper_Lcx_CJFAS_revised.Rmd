@@ -1,0 +1,798 @@
+---
+title: Random effects on numbers-at-age transitions implicitly account for movement dynamics and improve stock assessment and management
+author:  
+  - Chengxue Li$^{1,6,*}$
+  - Jonathan J. Deroba^1^
+  - Aaron M. Berger^2^
+  - Daniel R. Goethel^3^
+  - Brian J. Langseth^4^
+  - Amy M. Schueller^5^
+  - Timothy J. Miller^1^
+date: ''
+fontsize: 12pt
+output:  
+  pdf_document:  
+    citation_package: natbib  
+    fig_caption: yes  
+    includes:  
+      in_header:  
+      - options.sty  
+      - journalshortcuts.tex  
+    latex_engine: xelatex  
+    keep_tex: yes  
+    number_sections: yes  
+  html_document:  
+    df_print: paged  
+  word_document: default
+header-includes:  
+- \usepackage{float}  
+- \usepackage{amsmath}  
+- \usepackage{pdflscape}  
+- \usepackage{hyperref}  
+- \usepackage{xspace}  
+- \usepackage{bm}  
+- \usepackage{caption,graphics}  
+- \usepackage{graphicx}  
+- \usepackage{makecell}  
+- \usepackage{lineno}  
+- \linenumbers  
+- \renewcommand\figurename{Figure.}  
+- \captionsetup{labelsep=period, singlelinecheck=false}  
+- \newcommand{\changesize}[1]{\fontsize{#1pt}{#1pt}\selectfont}  
+- \renewcommand{\arraystretch}{1.5}  
+- \renewcommand\theadfont{}
+csl: canadian-journal-of-fisheries-and-aquatic-sciences.csl
+biblio-style: cjfas2.bst
+editor_options:  
+  markdown:  
+    wrap: 72
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy=FALSE, tidy.opts=list(width.cutoff=60),
+                      warning = FALSE, message = FALSE, fig.align = "center")
+knitr::opts_knit$set(root.dir = '../' )
+library(knitr)
+library(tidyverse)
+library(pander)
+library(kableExtra)
+library(png)
+library(forcats)
+```
+  
+$^{1}$ NOAA, Northeast Fisheries Science Center, 166 Water Street, Woods Hole, MA 02543, USA
+
+$^{2}$ NOAA, Northwest Fisheries Science Center, 2032 SE OSU Drive, Newport, OR 97365, USA
+
+$^{3}$ NOAA, Alaska Fisheries Science Center, 17109 Point Lena Loop Road, Juneau, AK 99801, USA
+
+$^{4}$ NOAA, Northwest Fisheries Science Center, 2725 Montlake Blvd E, Seattle, WA 98112, USA
+
+$^{5}$ NOAA, Southeast Fisheries Science Center, 101 Pivers Island Road, Beaufort, NC 28516, USA
+
+$^{6}$ Saltwater Inc., 733 N Street, Anchorage, AK 99501, USA
+
+$^{*}$ Corresponding author: chengxue.li@noaa.gov
+
+\pagebreak
+
+# Abstract {-}
+
+Implementing operational assessment models that account for spatial structure and movement dynamics is challenging, especially with limited tagging data. Random effects on numbers-at-age (NAA) transitions in state-space models offer a potential solution to circumvent direct movement estimation by attributing movement variation to NAA random effects. However, whether this approach reliably achieves desirable management outcomes remains unclear. In this study, we conducted a management strategy evaluation that emulated a generic medium-lived fish that exhibit natal homing dynamics, using assessment models with varying levels of spatial complexity. We compared the performance of each spatial implementation with and without NAA random effects to evaluate their effectiveness in achieving management outcomes. Our results showed that models with NAA random effects consistently outperformed those without, although the benefits of NAA random effects degraded at high rates of movement. Therefore, NAA random effects could serve as a practical intermediate solution when explicit movement modeling is not feasible due to insufficient movement information. Our findings suggest that incorporating NAA random effects should be a default starting point in state-space stock assessments. (word count: 174)
+  
+**Keywords**: state-space models, management strategy evaluation, movement dynamics, numbers-at-age transitions, random effects
+  
+<!-- note CJFAS abstract word limit 175 -->
+    
+\pagebreak
+
+# Introduction 
+
+Random effects on numbers-at-age (NAA) transitions introduce flexibility into a state-space stock assessment that can partially represent misspecification of unmodeled processes, such as movement, natural mortality, selectivity, or misreported catch \citep{Nielsen2014, Cadigan2016, Albertsen2018, Perretti2020, Stock2021a, Stock2021b}. Simulation-estimation studies have consistently concluded that incorporating NAA random effects results in less biased estimates of management quantities (e.g., biomass, reference points), even when NAA random effects were included in the assessment model but absent in the operating model that generated the data \citep{Li2024}. Previous studies suggested that NAA deviations can be interpreted as migrations or irregular natural mortality \citep{Frisk2010, Gudmundsson2012}. However, the extent to which NAA random effects improve assessment results and management outcomes when accounting for movement has not been explicitly tested within the state-space modeling framework, despite claims that they can do so \citep{Gudmundsson2012, Nielsen2014, Stock2021a}.
+  
+The benefits of accounting for spatial structure and movement dynamics in stock assessments have become increasingly apparent \citep{Goethel2021, Bosley2022, Goethel2023, Berger2024} and are necessary as climate change continues to drive fish movement, alter fish biology and ecology, and affect habitat availability and suitability \citep{Portner2010, Ciannelli2013}. Acknowledging biocomplexity and spatial heterogeneity in fish distribution and demographics challenges the panmictic assumptions of traditional stock assessment models, which treat the stock as as a single population that is uniformly distributed, demographically homogeneous, closed to migration, and reproductively isolated \citep{Beverton1957, Cadrin2020}. In practice, these models represent heterogeneous stocks by estimating population totals based on average weights, maturities, and mortality rates, thereby smoothing over underlying spatial and demographic variation. Assessment models that do not account for spatial structure and movement dynamics, when in fact they are present, can produce biased estimates of population quantities, potentially failing to achieve management objectives \citep{Bosley2019, Goethel2023}. Including spatial structure and movement dynamics in stock assessments, however, can be challenging \citep{Punt2019, Punt2020, Goethel2022, Berger2021, Berger2024}, and in some cases may not be practical due to jurisdictional or management constraints \citep{Kerr2017}, low quality and quantity of geo-partitioned data \citep{Cadrin2020, Punt2020}, inadequate tagging information \citep{Goethel2011, Goethel2019}, or limited knowledge about population origin and connectivity \citep{Berger2017}. 
+  
+The "fleets-as-areas" approach is often used as a practical starting point in spatial assessments \citep{Berger2012, Waterhouse2014, Lee2017, Bosley2022}. This approach assumes the population is uniformly distributed across its range; any apparent spatial heterogeneity is represented indirectly by defining area-specific fleets, with differences in age compositions attributed to fishing selectivity rather than explicit spatial structure. However, differences in estimated selectivity across areas may not reflect actual differences in the underlying gear- or fleet-specific selectivity patterns. Instead, such differences may arise from spatial heterogeneity in the population itself (e.g., age structure differences caused by movement, source–sink dynamics, or environmentally driven shifts in distribution) \citep{Cope2011, Berger2012, Hurtado2014, O'Boyle2016}. When such dynamics are present, the implicit mismatch between the assumption (spatially varying selectivity) and the underlying process (spatially varying distribution) can undermine the performance of the assessment–management framework \citep{Punt2016a, Punt2016b}.
+
+Explicitly specifying population structure and spatial units, but ignoring movement, provides an alternative approach for improving population estimates and derived management parameters in a spatial context, particularly when adult movement is infeasible to estimate \citep{Cadrin2019, Goethel2023}. Evidence suggests that incorporating spatially referenced parameters within an assessment model to account for the net effects of movement on observations of population structure at the local scale is both practical and broadly applicable to many fisheries \citep{Berger2012, Goethel2023}. This approach is particularly useful in cases where species biology varies geographically due to local biophysical conditions, habitat availability and suitability, or harvest patterns \citep{Goethel2023}, and when adult movement is limited, with larval dispersal driving spatial structure \citep{Kerr2017}.
+
+Incorporating NAA random effects in state-space models represents a step forward in model complexity, where spatial structure is implicitly or explicitly defined, and movement is handled implicitly through NAA random effects. Evaluating whether NAA random effects can improve management outcomes in stock assessments that exclude explicit movement modeling is crucial. Using NAA random effects as an "add-on" proxy for movement simplifies movement dynamics and reduces the number of parameters estimated in the assessment model. However, despite simplifying parameter estimation, NAA random effects do not mechanistically capture the underlying movement dynamics of fish populations. Instead, movement variability is absorbed into the NAA random effects structure, which can lead to misinterpretations of population processes, model misspecification, and biased estimates of stock status and productivity.
+
+Thus, NAA random effects may provide a more tractable solution, but the trade-off between model complexity and biological realism must be carefully considered, especially in the context of management performance. One effective tool to evaluate whether management procedures achieve management objectives (e.g., sustainable catch) is through management strategy evaluation (MSE) \citep{Punt2017,Keymer2000}. The MSE approach in a spatial context involves considering various candidate spatial population structures, data collection methods, estimation model structures, harvest control rules, and their interactions and feedbacks \citep{Kerr2014, Goethel2016}. 
+
+In this study, we use a MSE with closed-loop simulations to evaluate the performance of several spatial assessment model configurations that do not explicitly account for movement but include NAA random effects, while the operating model defining the true population dynamics includes movement. We examine the utility of incorporating NAA random effects across increasing levels of assessment model complexity (panmictic, spatially implicit, and spatially explicit) and assess their influence on estimated assessment quantities and management outcomes under varying movement dynamics and historical fishing pressure.
+
+# Methods  
+
+## Model Overview 
+
+The Woods Hole Assessment Model (WHAM, https://timjmiller.github.io/wham), a state-space assessment model, was used as the basis of the operating model (OM) and estimation model (or assessment model; EM) in the MSE framework. WHAM can incorporate time- and/or age-varying process errors on population and fishery processes, including recruitment, NAA, natural mortality, movement, fishing selectivity, and survey catchability, and it has ability to link environmental covariates to specific processes \citep{Stock2021a}. More recently, WHAM has been extended to incorporate spatial dynamics, allowing populations to be modeled with spatial heterogeneity in biology, movement, and fleet dynamics \citep{Millerinreview}. Here we give a minimal overview necessary for the present study (see Methods in the supplementary file for details). We used the SPASAM-MSE package (https://lichengxue.github.io/whamMSE/), a comprehensive MSE toolbox developed upon WHAM \citep{Liinreview2}, to conduct MSE and explore potential implications of management strategies. 
+
+## Operating Models (OMs)
+
+Two operating models (OMs) were developed that represent the true dynamics of the system. Each was conditioned using parameters for fish with a medium-lived (maximum age = 12) life history (Wiedenmann et al., 2015) and differed only in the rates of movement assumed (high and low) between populations and regions (\autoref{para_tab}). The spatial domain included two regions, each of which is the natal home of one population but can also be occupied by the other population outside the spawning season. Population and fishery parameters were consistent across the domain, with exceptions for stock-recruitment relationship and fishing selectivity (\autoref{para_tab}).
+
+### Fishing History
+
+For each OM, three alternative fishing histories (see \autoref{F_scenario_table}) were used during the simulation historical period: 1) $\text{F}_\text{A}$: both regions experience overfishing (2.5$F_{MSY}$) for the first 15 years and fishing at $F_{MSY}$ for the last 15 years; 2) $\text{F}_\text{U}$: both regions experience constant overfishing (2.5$F_{MSY}$) for the entire 30 years; and 3) $\text{F}_\text{C}$: region 1 experiences overfishing (2.5$F_{MSY}$) for the first 15 years and fishing at $F_{MSY}$ for the last 15 years, while region 2 follows the opposite fishing history. 
+
+### Biological Information
+
+The Beverton-Holt stock-recruitment relationship was assumed for both populations, with slightly different productivity (${\alpha}$) parameters to create some discrepancy in biology between the two populations. Weight-at-age, maturity-at-age, and natural mortality were assumed to be the same between the two populations. Initial numbers-at-age for each population were specified at the equilibrium distribution fishing at ${F}$ = 0.1 in each region with an initial recruitment of $e^{10}$. 
+
+### Numbers-at-age (NAA) Transitions
+
+For simplicity, we present the one-population, one-region version of the NAA transition equations. When the number of populations (\(n_s > 1\)) or regions (\(n_r > 1\)) increases, the formulation extends to higher dimensions by incorporating population- and region-specific random effects \citep{Millerinreview}. The numbers-at-age transitions are:
+
+\begin{equation}
+\log(N_{a,y}) =
+\begin{cases}
+\log(f(\text{SSB}_{y-1})) + \epsilon_{1,y}, & a = 1 \\[-0.3em]
+& \epsilon_{1,y} \sim N(0,\sigma_{Rec}^2) \\
+\log(N_{a-1,y-1} e^{-Z_{a-1,y-1}}) + \epsilon_{a,y}, & 1 < a < A \\[-0.3em]
+& \epsilon_{a,y} \sim N(0,\sigma_{NAA}^2) \\
+\log(N_{A-1,y-1} e^{-Z_{A-1,y-1}} + N_{A,y-1} e^{-Z_{A,y-1}}) + \epsilon_{A,y}, & a = A \\[-0.3em]
+& \epsilon_{A,y} \sim N(0,\sigma_{NAA}^2)
+\end{cases}
+\end{equation}
+
+where \(N_{a,y}\) is the abundance at age \(a\) in year \(y\), \(Z_{a,y} = F_{a,y} + M_{a,y}\) is total mortality, \(f(\cdot)\) is the stock–recruitment function, \(A\) defines the plus-group, and \(\epsilon\) are lognormal process errors. In this study, recruitment and NAA transitions in the OM were treated as independent and identically distributed (IID) random effects, with \(\sigma_{Rec} = 0.5\) for recruitment and \(\sigma_{NAA} = 0.2\) for age transitions across populations and regions.
+
+### Movement Dynamics
+
+Four seasons (spring, summer, autumn, and winter) were included in the OMs to represent seasonal migrations characteristic of natal homing dynamics. Specifically, the two reproductively isolated populations were assumed to return to their natal regions at the end of summer, spawn in autumn, and migrate to other regions during spring and winter (e.g., for feeding migrations). Two different movement scenarios low movement and high movement were included in this study (see \autoref{fig:movement_dynamics}). The high movement scenario ($\text{OM}_{\text{high}}$) allows both populations to move between regions outside the spawning season. The movement rate from region 1 to region 2 was assumed to be much higher than the rate in the opposite direction, reflecting a degree of source-sink dynamics, that could reflect habitat suitability \citep{Keymer2000}. The low movement scenario ($\text{OM}_{\text{low}}$) allows population 1 to move from region 1 to region 2 and back from region 2 to region 1, whereas population 2 cannot move between regions. This type of movement represents strict source-sink movement dynamics typical of some species (e.g., black sea bass, *Centropristis striata*, Miller et al., In  Press). The movement rate outside the spawning season was assumed to be time-varying and treated as a random effect, with a standard deviation of 0.5 and an AR1 autocorrelation coefficient of 0.5. In each simulation replicate, a new realization of these movement rates was generated; examples are shown in \autoref{fig:supp_movement1} and \autoref{fig:supp_movement2}.
+
+### Fleet and Survey
+
+A fishing fleet was assumed to operate in each region, with logistic selectivity patterns differing slightly between the two fleets to reflect spatial heterogeneity (\autoref{para_tab}). A survey was assumed to be conducted in each region during the spawning season to provide the most accurate index of $SSB$ for each population. Both surveys share the same selectivity curve, with a lower $a_{50}$ than that of the fleet, ensuring that adequate information on young fish can be collected. A multinomial distribution with an effective sample size of 100 was assumed for the fleet and survey composition data, and a log-normal distribution with a coefficient of variation (CV) of 0.1 was used for aggregate catch and survey indices. Weight-at-age was assumed to be the same across populations, regions, fleets, and surveys.
+
+## Estimation Models (EMs)
+
+EMs with varying population structures, complexities, and the inclusion or exclusion of NAA random effects were explored (\autoref{fig:EM_structure}; \autoref{EM_tabel}). For simplicity, EMs that included NAA random effects are hereafter referred to as $\text{EMs}_{\scriptscriptstyle \text{NAA}}$, while EMs without NAA random effects are referred to as $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$.
+
+Of the 10 EMs, the first 8 were paired (with and without NAA random effects) and included a single spatially aggregated panmictic assessment model ($\text{PAN}_{\scriptscriptstyle \text{NAA}}$ and $\text{PAN}_{\scriptscriptstyle \text{noNAA}}$), a single spatially implicit assessment model ($\text{FAA}_{\scriptscriptstyle \text{NAA}}$ and $\text{FAA}_{\scriptscriptstyle \text{noNAA}}$), two separate individual assessment models by region ($\text{SEP}_{\scriptscriptstyle \text{NAA}}$ and $\text{SEP}_{\scriptscriptstyle \text{noNAA}}$), and a spatially disaggregated assessment model with no movement ($\text{SpD}_{\scriptscriptstyle \text{NAA}}$ and $\text{SpD}_{\scriptscriptstyle \text{noNAA}}$). The difference between SEP and SpD EMs is that SpD EMs use global SPR-based reference points weighted by regional recruitment, while SEP EMs separately calculate regional SPR-based reference points. In addition, SpD EMs allow certain parameters (e.g., NAA, movement) to be shared across regions, whereas SEP EMs require separate parameter sets for each region. The remaining two EMs were spatially explicit with movement either fixed ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) at the true value or with mean movement estimated ($\text{SpE}_{\scriptscriptstyle \text{NAA,Est}}$) using a prior distribution (with mean = $\mu_{True}$ and standard deviation = 0.5). When NAA random effects were included in the EM, they were modeled as independent and identically distributed (IID) normal ($\mathcal{N}$) random effects in log space. In this case, only a single additional variance parameter ($\sigma_{NAA}$) is estimated, representing variability in the NAA transitions for that population within each region. Recruitment in all EMs was likewise modeled as IID normal random effects in log space.
+
+The EM with fixed movement ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) was considered as the best possible EM and was treated as the baseline for comparison. 
+
+## Management Strategy Evaluation (MSE)
+
+A MSE was conducted to evaluate the performance of the EMs. MSEs are typically implemented as closed-loop simulations, where population dynamics, data collection, stock assessment, and management actions are linked together. Management decisions feed back into the system and affect future population trajectories, allowing the long-term consequences of alternative strategies to be evaluated in a realistic, iterative framework.
+
+In this study, the closed-loop simulation included a 30-year historical period followed by a 30-year feedback period. Preliminary results indicated that a 30-year feedback period was sufficient to capture differences in management outcomes among the EMs compared to a longer feedback period. Assessments were conducted every 3 years, with each assessment using the most recent 20 years of data available at that time. Sensitivity analysis indicated small differences in convergence rates and parameter estimates of the EMs when the number of years of input data was increased beyond 20 \citep{Li2018}. 
+
+In the interim years between assessments, the population was projected in the EM using the average selectivity-at-age, maturity-at-age, weight-at-age, and natural mortality from the last 5 model years of the most recent assessment, as well as the average recruitment across all model years. For EMs with processes (e.g., recruitment, NAA, movement) treated as random effects, only recruitment random effects were assumed to continue while other process random effects were set to zero during the projection years \citep{Stock2021a}. To avoid confounding effects from differences in model specifications of process random effects and spatial dynamics, we elected to allow only recruitment random effects to persist into the projection period. This ensured consistency across EMs, since all models included recruitment random effects.
+
+Target catch in those interim years, was based on a constant fishing mortality harvest control rule at $F_{40\%}$. The SEP EM used region-specific SPR-based reference points, whereas all other EMs used global SPR-based reference points. For SpD and SpE EMs, additional weights based on the mean recruitment of each population estimated by the EM were applied when calculating the global SPR-based reference points. In contrast, no such weights were used for PAN and FAA EMs, as they assumed a single population and relied on a total estimated recruitment. For the PAN EM, the total catch target was allocated to region-specific catches using weights derived from the relative biomass catch observed in each survey during the terminal year of the assessment \citep{Bosley2019}. All other EMs provided region-specific catch advice that was inherently based on regional $F$-at-age matrices, all of which collectively contribute to the calculation of the global $F$. See \autoref{HCR_table} for more details about catch apportionment.
+
+The annual catch advice from each EM was sequentially fed into the OMs to update $F$ and population dynamics. This closed-loop simulation was performed iteratively until the end of the feedback period. The EMs were first fit at the end of the 30-year historical period (year 30) and then refit every three years during the 30-year feedback period, resulting in 10 EM fits per OM iteration. The final EM fit occurred in year 57, and its catch advice was used to update the OM through the end of year 60. If any of the 10 EMs failed to converge during a replicate, the results for that entire replicate, across all EMs, were discarded. A new random seed was selected, and the replicate was attempted again until 100 replicates successfully converged for all 10 EMs in the study. In total, the MSE evaluated 60 scenarios comprising two states of nature (high or low movement), three fishing histories, and 10 EMs.
+
+### EM Diagnostics 
+
+Performance was summarized over 100 converged runs to ensure equal sample sizes across scenarios. Convergence rates for each EM were calculated based on the first 100 realizations (including replicates that failed to converge) for each OM and fishing history. In addition to convergence rates, all 10 EMs were evaluated by comparing their estimates of mean recruitment, recruitment standard deviation, and NAA standard deviation, using all 1,000 converged models (100 replicates per EM) for each OM and fishing history.
+
+### Simulation-Estimation Results
+
+To evaluate estimation bias of each EM, the relative bias of estimated annual recruitments and $SSB$ was calculated for each EM compared to the true values from the simulated pseudo-dataset $i$. The median relative bias for each EM from the first assessment was calculated as:
+
+```{=tex}
+\begin{equation}
+\text{Relative Error}_{i} = \text{Median} \left( \frac{\hat{\theta}_{i,y}}{\theta_{i,y}} - 1 \right)
+\end{equation}
+```
+
+where $\theta(i,y)$ represents the true value for year $y$ from the simulated pseudo-dataset $i$, and $\hat{\theta}(i,y)$ is the estimated value obtained from the EM fitted to the pseudo-dataset.
+
+To compare parameter estimates associated with recruitment and NAA processes, estimates of mean recruitment ($\mu_{Rec}$), recruitment standard deviation ($\sigma_{Rec}$), and NAA standard deviation ($\sigma_{NAA}$) were also collected from the EMs at the last iteration of the closed-loop.
+
+### MSE Performance Metrics
+
+Short-term (first 5 years of the feedback period) and long-term (last 5 years of the feedback period) performance metrics at both global and regional scales were evaluated to quantify the performance of each EM. These performance metrics include: 
+
+- Average catch: $\frac{1}{n} \sum_{y=1}^{n} {\text{Catch}}_y$; 
+
+- Average fully selected ${F}$: $\frac{1}{n} \sum_{y=1}^{n} {F}_y$; 
+
+- Average ${SSB}$: $\frac{1}{n} \sum_{y=1}^{n} {SSB}_y$; 
+
+Here, catch refers to the catch advice projected by each EM. This projected catch is treated as the realized catch in the OM, with no observation error added (i.e., projected catch from the EM = actual catch in the OM). When updating $F$ in the OM, the true catch is used without observation error, and the resulting $SSB$ represents the true $SSB$ from the OM given that $F$. Although observed catch values with error are generated in the observation model and can be used for comparison, they are not used in the calculation of the performance metrics presented here.
+
+In our study, $\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$ was used as the baseline EM because it represents performance with correctly specified movement, thereby reflecting the best possible performance. For replicate $i$, the relative difference between the performance metrics of the baseline EM and other EMs was calculated as:
+
+\begin{equation}
+\text{Relative Difference }(i) = \frac{\text{Metric}_{EM_{x}}(i)}{\text{Metric}_{\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}}(i)} - 1
+\end{equation}
+
+This approach standardizes differences across performance metrics, providing better visualization and comparison on the same scale. 
+
+Following performance metrics were also collected:
+
+- Probability of ${F} > {F_{MSY}}$: $\text{P}_{\text{F>F}_{\text{MSY}}} = \frac{1}{n} \sum_{y=1}^{n} I\left( \frac{F_y}{F_{MSY_{y}}} > 1 \right)$; 
+
+- Probability of ${SSB} < {SSB_{MSY}}$: $\text{P}_{\text{SSB<SSB}_{\text{MSY}}} = \frac{1}{n} \sum_{y=1}^{n} I\left( \frac{SSB_y}{SSB_{MSY_{y}}} < 1 \right)$; 
+
+- Overfishing status in the terminal year of the feedback period: $\text{OFG}_\text{terminal} = \frac{F_T}{F_{MSY_{T}}}$;
+
+- Overfished status in the terminal year of the feedback period: $\text{OFD}_\text{terminal} = \frac{SSB_T}{SSB_{MSY_{T}}}$;
+
+- Average annual catch variation: $\text{AACV} = \frac{\sum_{y=1}^{n} \left|\text{Catch}_{y} - \text{Catch}_{y-1}\right|}{\sum_{y=1}^{n} \text{Catch}_{y-1}}$. 
+
+The annual global reference points ($F_{MSY_{y}}$ and $SSB_{MSY_{y}}$) were used for calculating some of the above performance metrics \citep{Millerinreview}, with global values obtained as a weighted sum, where weights were based on the mean of realized annual recruitments for each population within each replicate.
+
+All performance metrics for the 10 EMs at the global scale were collected to provide a holistic view of model performance. Metrics such as catch, $F$, $SSB$, terminal-year $SSB/SSB_{MSY}$ for each OM and fishing history were normalized to scores between 0 and 1 using:
+
+\begin{equation}
+\text{Score } (i) = \frac{\text{Metric}_{EM_x}(i) - \min(\text{Metric}_{EM_{A}}(i))}{\max(\text{Metric}_{EM_{A}}(i)) - \min(\text{Metric}_{EM_{A}}(i))}, \text{with } A = \{1, 2, \dots, 10\}
+\end{equation}
+
+For metrics where higher values indicated poorer performance (i.e., $\text{P}_{\text{F>F}_{\text{MSY}}}$, $\text{P}_{\text{SSB<SSB}_{\text{MSY}}}$, $\text{OFG}_\text{terminal}$, and AACV), normalization was adjusted to ensure higher values consistently indicate better performance, as follows:
+
+\begin{equation}
+\text{Score } (i) = 1- \frac{\text{Metric}_{EM_x}(i) - \min(\text{Metric}_{EM_{A}}(i))}{\max(\text{Metric}_{EM_{A}}(i)) - \min(\text{Metric}_{EM_{A}}(i))}, \text{with } A = \{1, 2, \dots, 10\}
+\end{equation}
+
+The median, 25th quantile, and 75th quantile of the above performance metrics and scores were calculated and presented in the results.
+
+# Results
+
+Our simulation–estimation results indicated the $\text{SpE}_{\scriptscriptstyle \text{NAA,Est}}$ EM and the $\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$ EM (baseline EM) performed similarly, both producing accurate estimates of recruitment (\autoref{fig:supp_Bias_Rec_OM_1} and \autoref{fig:supp_Bias_Rec_OM_2}) and $SSB$ (\autoref{fig:supp_Bias_SSB_OM_1} and \autoref{fig:supp_Bias_SSB_OM_2}), as well as comparable estimates of model parameters (\autoref{fig:supp_Parameter_Estimates_OM_1} and \autoref{fig:supp_Parameter_Estimates_OM_2}). In addition, our MSE results showed that $\text{SpE}_{\scriptscriptstyle \text{NAA,Est}}$ performed similarly to the baseline EM for most performance metrics and performed relatively better than the other EMs. 
+
+For clarity and space, we focused the discussion on a subset of representative cases. Specifically, we excluded further discussion of the $\text{SpE}_{\scriptscriptstyle \text{NAA,Est}}$ EM since its results closely mirrored those of the baseline EM. We also emphasized results for $\text{OM}_{\text{high}}$ rather than $\text{OM}_{\text{low}}$, because both produced qualitatively consistent outcomes but $\text{OM}_{\text{high}}$ highlighted differences among EMs more clearly. Results of $\text{OM}_{\text{low}}$ generally aligned with those of $\text{OM}_{\text{high}}$, but performance metrics among EMs were less distinct due to lower movement rates. Additionally, $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ under the $\text{OM}_{\text{low}}$ scenario generally performed similarly to the baseline EM. A brief summary of the $\text{OM}_{\text{low}}$ results is included at the end of this section, with further detail in the supplementary material (Figures S16–S35).  
+
+Convergence rate was high (85–100%) for all cases.
+
+## Simulation-estimation Results 
+
+Total recruitment estimate from PAN and FAA EMs were similar to the sum of region-specific recruitment from SEP and SpD EMs, all of which were slightly overestimated compared to the total recruitment estimated from the baseline EM (\autoref{fig:supp_Bias_Rec_OM_1}). The mean recruitment parameter ($\mu_{Rec}$), recruitment standard deviation ($\sigma_{Rec}$) and NAA standard deviation ($\sigma_{NAA}$) from EMs without movement included, appeared to compensate to account for the absence of movement dynamics (\autoref{fig:supp_Parameter_Estimates_OM_1}). This pattern indicates that variation arising from movement dynamics was instead absorbed by recruitment and NAA random effects, effectively compensating for the absence of explicit movement processes.
+
+## MSE Performance Metrics 
+
+### Relative Difference in Annual Catch and $SSB$
+
+Relative difference in annual catch over the 30-year feedback period revealed larger discrepancies among EMs during the first 10 years compared to later years. As time progressed, $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ performed more similarly to the baseline EM (\autoref{fig:supp_annual_catch_G_OM1}). This trend was more pronounced at the regional scale (Figures S6-S7). Relative differences in annual $SSB$ at both global (\autoref{fig:supp_SSB_G_OM1}) and regional scales (Figures S9-S10) tended to diverge from zero over time. $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ maintained higher $SSB$ that was more similar to the baseline EM than $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$.
+
+### Short-term Catch, $F$, and $SSB$
+
+In the first five years of the feedback period, $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ generally produced catch, $F$, and $SSB$ more similar with smaller variations (i.e., inter-quantile ranges) to the baseline EM than $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$ at both regional and global scales (\autoref{fig:first_5yr_results}). SEP and SpD EMs with NAA random effects generally produced results more similar to the baseline EM than other EMs, and this was especially true for the $\text{SpD}_{\scriptscriptstyle \text{NAA}}$ EM (\autoref{fig:first_5yr_results}). 
+
+Performance in catch, $F$, and $SSB$ also exhibited difference across EMs with difference in model complexity. For example, PAN EMs generally produced higher catch (with higher $F$) in region 1 and lower catch (with lower $F$) in region 2, and as a result lower $SSB$ in region 1 and higher $SSB$ in region 2, although the global performance metrics were similar to the baseline EM (\autoref{fig:first_5yr_results}). Despite high contrast in $F$ between regions when using PAN EMs, $SSB$ showed only marginal difference compared to the baseline (5% less) in the short term (\autoref{fig:first_5yr_results}). 
+
+### Long-term Catch, $F$, and $SSB$
+
+In the last five years of the feedback period, there was marginal difference in median catch (despite variations being higher for $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$) at both regional and global scales between $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ and $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$ across differing levels of model complexity (\autoref{fig:last_5yr_results}). However, $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$ often produced significantly high $F$, particularly at the regional scale (\autoref{fig:last_5yr_results}). The consistently high $F$ in $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$ resulted in lower $SSB$ compared to the baseline EM at both regional and global scales (\autoref{fig:last_5yr_results}).
+
+Spatially implicit and explicit EMs (i.e., FAA, SEP, and SpD EMs) performed similarly, particularly at the global scale, all of which produced ~10% lower $SSB$ when NAA random effects were included and ~20% lower $SSB$ when NAA random effects were not included, compared to the baseline EM (\autoref{fig:last_5yr_results}). The simplest PAN EMs performed slightly better than other EMs at the global scale, particularly under the unsustainable and contrasting fishing histories (5-10% lower global $SSB$) (\autoref{fig:last_5yr_results}). However, the corresponding $F$ for region 1 produced by PAN EMs was 50%-75% higher than the $F$ in the baseline EM (\autoref{fig:last_5yr_results}).
+
+### Average Annual Catch Variation (AACV)
+
+Including NAA random effects exhibited potential to lower AACV, particularly at the regional scale, regardless of model complexity and fishing histories (\autoref{fig:aacv}). Although AACV at the global scale was similar across EMs for each fishing history, some benefits of including NAA random effects in reducing AACV were still observed under the adaptive fishing history (\autoref{fig:aacv}). AACV at the global scale was particularly low when the $\text{PAN}_{\scriptscriptstyle \text{NAA}}$ EM was used (\autoref{fig:aacv}). At the regional scale, relatively low AACV occurred when using FAA EMs, which even outperformed the baseline EM, regardless of fishing histories (\autoref{fig:aacv}). In contrast, PAN and SEP EMs generally exhibited high AACV at the regional scale (\autoref{fig:aacv}).
+
+### Probability of Overfished and Overfishing
+
+In most cases, $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ outperformed $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$ in preventing populations from becoming overfished and overfishing at the global scale (\autoref{fig:Overfished_OM1}). $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ exhibited similar performance in terms of the probability of ${SSB} < {SSB_{MSY}}$ compared to the baseline EM, but performed worse in preventing overfishing (\autoref{fig:Overfished_OM1}). The probability of overfishing was found to be lower when using the $\text{PAN}_{\scriptscriptstyle \text{NAA}}$ EM compared to other $\text{EMs}_{\scriptscriptstyle \text{NAA}}$, except for SpE EMs, as indicated by the consistently smaller overfishing probabilities in \autoref{fig:Overfished_OM1}.
+
+### Terminal-year Status 
+
+Populations were not overfished in the terminal year at the global scale, regardless of NAA random effects, model complexity, and fishing histories (\autoref{fig:supp_population_status_G_OM_1_MSY}). $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ performed better than $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$ in preventing global overfishing in the terminal year (\autoref{fig:supp_population_status_G_OM_1_MSY}). Notably, none of $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$ could prevent global overfishing (\autoref{fig:supp_population_status_G_OM_1_MSY}). 
+
+### Holistic View of Performance
+
+In general, $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ outperformed $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$ across most metrics, except for short-term catch (\autoref{fig:holistic_OM1}). $\text{SEP}_{\scriptscriptstyle \text{noNAA}}$ produced the highest global catch under adaptive and unsustainable fishing histories, while $\text{PAN}_{\scriptscriptstyle \text{noNAA}}$ produced the highest global catch under the contrasting fishing history (\autoref{fig:holistic_OM1}). Relatively complex $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$, such as $\text{SEP}_{\scriptscriptstyle \text{noNAA}}$ and $\text{SpD}_{\scriptscriptstyle \text{noNAA}}$ EMs, exhibited the lowest global performance among all EMs, performing even worse than the simplest $\text{PAN}_{\scriptscriptstyle \text{noNAA}}$ EM (\autoref{fig:holistic_OM1}). Similar results were found at the regional scale (Figures S14-S15).
+
+### Performance under the Low Movement Scenario
+
+Short-term and long-term performance showed that $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ performed more similarly to the baseline EM (Figures S26-S27). Specifically, $\text{SEP}_{\scriptscriptstyle \text{NAA}}$ and $\text{SpD}_{\scriptscriptstyle \text{NAA}}$ EMs exhibited nearly identical performance to the baseline EM in terms of catch, $F$, and $SSB$ (Figures S26-S27). In contrast, $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$, although achieving higher catch in the short term, led to significant declines in $SSB$ in the long term at both regional and global scales, regardless of model complexity or fishing history (Figures S26-S27). Similar patterns in AACV, $\text{P}_{\text{SSB<SSB}_{\text{MSY}}}$, $\text{P}_{\text{F>F}_{\text{MSY}}}$, $\text{OFD}_\text{terminal}$, and $\text{OFG}_\text{terminal}$ were observed under the high movement scenario (Figures S28-S32). These results consistently demonstrate that $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ outperformed $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$, with the most complex EMs with NAA generally showing superior performance compared to other EMs (Figures S33-S35).
+
+# Discussion 
+
+Our findings confirm that management outcomes generally improve when NAA random effects are included, whereas excluding them from assessment models leads to undesirable outcomes both regionally and globally. Earlier claims have suggested that NAA deviations can represent fish migration in stock assessment models \citep{Gudmundsson2012}. Our study suggests that the improved management outcomes likely result from the ability of NAA random effects to implicitly account for movement variation, in accordance with the understanding that NAA random effects serve as a 'catch-all' to absorb process variation from confounding processes such as fishing selectivity and natural mortality \citep{Li2024}.  
+
+## Improved Parameter Estimation with NAA Random Effects
+
+It is common for one modeled process to alias others in state-space models \citep{Stock2021b}. Our study demonstrates that NAA random effects not only alias unmodeled movement dynamics but also mitigate the consequences of model misspecification caused by the lack of a movement component in the assessment model. We found that NAA random effects absorbed movement process variation. Without NAA random effects, mean recruitment and recruitment variability increased significantly to compensate for movement. When NAA random effects are included, the movement-related uncertainty is partitioned between recruitment and NAA. This partitioning reduces recruitment overestimation and attributes some of the movement uncertainty to NAA random effects, as evidenced by decreased recruitment variability and increased NAA variability. Consequently, $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ provided more accurate recruitment estimates, both regionally and globally. For example, estimates of global recruitment and recruitment in region 2 showed significant improvements in $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ compared to models without them. A similar pattern was observed for $SSB$, with global $SSB$ and region 2 $SSB$ estimates being more accurate in $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ compared to $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$. This improvement may indirectly enhance the accuracy of other parameter estimates, thereby improving management outcomes.
+
+## Improved Management Performance with NAA Random Effects
+
+We showed that including NAA random effects generally improved management outcomes in nearly every aspect of performance metrics. By contrast, excluding NAA random effects impeded management outcomes by producing $F$ that induced overfishing, partially due to recruitment overestimation. This overestimation led to higher catch but decreased $SSB$, both regionally and globally, in the short term. The absence of NAA random effects caused more pronounced issues in the long term. For instance, consistently high $F$ driven by optimistic estimation of population size and productivity led to significant reductions in $SSB$, while the gain in catch diminished. Compared to the baseline EM, we found global $SSB$ declined by up to 20% and 15% under high and low movement scenarios, respectively, without corresponding increases in catch. Furthermore, mean recruitment and recruitment variability was amplified in $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$, leading to inaccurate estimation of population size and productivity, thereby impacting the stability of catch and $SSB$ in both the short term and long term. Issues of using $\text{EMs}_{\scriptscriptstyle \text{noNAA}}$ were further compounded when assessments were conducted every 3 years, as errors of population estimates, reference points, and catch advice accumulated during the interim years, ultimately degrading long-term management performance.
+
+Under low rates of movement, our results indicate that NAA random effects have the potential to account for movement and achieve satisfactory management outcomes. This is echoed by the nearly identical performance of $\text{SEP}{\scriptscriptstyle \text{NAA}}$ and $\text{SpD}{\scriptscriptstyle \text{NAA}}$ EMs compared to the baseline EM. However, under high movement rates, NAA random effects may struggle to fully compensate for the consequences of model misspecification due to the absence of explicitly modeled movement. For instance, while $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ achieved desirable management outcomes in the short term, in the long term global $SSB$ still decreased by 5-10%, with region 1 experiencing a 0-25% reduction and region 2 a 0-30% reduction, depending on historical fishing pressure and the spatial complexity of the assessment model. In addition, $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ exhibited limited ability to prevent overfishing, as reflected by even relatively complex EMs approaching overfishing thresholds in the terminal year.
+
+## Benefits of Correct Spatial Structure
+
+Our study demonstrates that the benefits of NAA random effects are maximized when combined with correct spatial structures in stock assessment models. Accurate spatial boundaries and sufficient data quantity and quality for spatial disaggregation are critical for achieving management objectives \citep{Berger2021}. Conversely, mismatches between population structures and management units can result in adverse management outcomes \citep{Cope2011, Hintzen2015, Kerr2017, Berger2021}. Spatial heterogeneity can arise from spatially heterogeneous biological characteristics such as recruitment, growth, maturity, and movement dynamics, or fishery characteristics such as fishing mortality and selectivity patterns. In our study, such heterogeneity created barriers for assessment models with incorrect spatial structure to achieve successful management, as demonstrated by increased risks of localized depletion due to inappropriate allocation of catch.
+
+Limitations of incorrect spatial structure were exemplified by the poor performance of the $\text{PAN}_{\scriptscriptstyle \text{NAA}}$ EM in our study, even when catch allocation was informed using the proportion of total survey biomass in each management area, a method regarded as best practice for  maximizing system yield when the underlying spatial structure is unknown \citep{Bosley2019}. The primary challenge in our scenario arises from the interaction of natal homing and source-sink dynamics under high movement rates, which reduces the effectiveness of this approach. In our high movement scenario, region 1 (source region with high productivity) disproportionately contributes to global recruitment but does not retain a large portion of its recruits. Instead, many recruits and subsequent fish at age 2+ migrate to region 2 (sink region with low productivity) outside the spawning season and contribute to the fishery there. If catch allocation is based solely on $SSB$ or recruitment within each region, this approach will likely lead to an underestimation of the contribution of the source region to the fishery in the sink region and overly optimistic estimation about the productivity from the source region. However, due to the substantial emigration of recruits to the sink region, the actual biomass available to the fishery in the source region should be lower than the survey suggests. This mismatch can result in overharvesting in the source region and underharvesting in the sink region, ultimately degrading management outcomes and reducing the likelihood of achieving maximum sustainable yield, as evidenced by significantly high $F$ (combined with risk of overfishing) in region 1 with low $F$ in region 2 (combined with not overfishing) in our study. In addition, fishing selectivity patterns differ between regions in our study, while assuming a 'global' fishing selectivity pattern in a PAN EM may lead to overestimation in one region and underestimation in another. This mismatch likely perturbs model performance, resulting in incorrect estimation of fishing status and suboptimal management advice. Even though management performance may be sustained, PAN EMs should be applied with caution, as they may lead to localized depletion \citep{Punt2015, Bosley2019, Bosley2022} and loss of biocomplexity, ultimately affecting population resilience and stability, particularly in the face of climate change and human perturbations \citep{Kerr2017}.
+
+The $\text{FAA}_{\scriptscriptstyle \text{NAA}}$ EM outperformed the $\text{PAN}_{\scriptscriptstyle \text{NAA}}$ EM in our study by providing robust estimates of population status and productivity, with regional catch advice better reflecting the underlying spatial heterogeneity in fishing patterns. Compared to the $\text{PAN}_{\scriptscriptstyle \text{NAA}}$ EM, the $\text{FAA}_{\scriptscriptstyle \text{NAA}}$ EM with spatial structure modeled implicitly delivered more desirable management outcomes in our study. We found that the $\text{FAA}_{\scriptscriptstyle \text{NAA}}$ EM also outperformed the baseline EM by providing more stable catches at both regional and global scales, consistent with Punt et al. (2017). This highlights their potential as a cost-effective approach for balancing model complexity and practicality. The fleets-as-areas approach assumes a single homogenous population while attributing regional differences in age compositions to fishing selectivity. In some cases, this flexibility in modeling spatially distinct fleet patterns helps absorb movement process variation by attributing differences in age compositions resulting from movement dynamics to fishing selectivity \citep{Cope2011, Berger2012, O'Boyle2016}. For example, previous studies have reported dome-shaped selectivity as a result of model behavior that helps capture spatial heterogeneity in population structure and fishing with low rates of movement \citep{Waterhouse2014}. Incorporating time-varying process error into selectivity has been shown to provide precise estimates of derived and management quantities when spatial patterns due to age-specific movement are unmodeled \citep{Lee2017}. This highlights an avenue for future research to explore modeling selectivity as random effects (in addition to NAA random effects) to better account for movement dynamics and improve model accuracy.
+
+$\text{SEP}{\scriptscriptstyle \text{NAA}}$ and $\text{SpD}{\scriptscriptstyle \text{NAA}}$ EMs, which explicitly model spatial structure, demonstrate promising potential in improving management outcomes. This is evident from their comparable management performance to the baseline EM in this study. However, their performance was degraded under the high movement scenario, as they do not fully capture the movement dynamics. Incorporating spatially referenced parameters in an assessment model is generally ideal when assumptions of homogeneity in biology and fisheries are violated, as it accounts for the spatial structure more effectively. With increasing model complexity and flexibility, assessment models may better account for the net effects of movement on observations of population structure at local scales, effectively addressing spatial structure and movement dynamics. The primary difference between SEP and SpD EMs lies in how biological reference points were determined. SpD EMs rely on global SPR-based reference points, which are weighted by the estimated recruitment within each region, whereas SEP EMs calculate reference points independently for each region. In most cases, our results showed minimal differences in management performance between these two EMs. However, under the contrasting fishing history, distinct patterns of fishing mortality impacted recruitment estimates in each region, thereby affecting the recruitment-based weights that determined the influence of each region on the global SPR-based reference point. Consequently, the $F$ reference points provided by SEP and SpD EMs differed, resulting in variations in regional management performance, while global management performance remained largely identical. For instance, source regions with high recruitment may dominate the global SPR-based reference point, even if their actual contribution to the fishery is diminished by emigration. This can lead to inappropriate catch allocations, causing underharvesting in source regions (due to overestimated recruitment weights) and overharvesting in sink regions (due to underestimated recruitment weights), as evidenced in our case where the $\text{SpD}_{\scriptscriptstyle \text{NAA}}$ EM resulted in underfishing for region 1 and overfishing for region 2 when movement rates were high. 
+
+Our results demonstrate that estimating movement in spatial state-space assessment models by treating movement as random effects with prior information (i.e. $\text{SpE}_{\scriptscriptstyle \text{NAA,Est}}$) could be a promising solution to better meet management objectives. This approach showed improved accuracy in parameter estimation and yielded more favorable management outcomes compared to EMs that excluded movement. However, assessment models estimating movement often rely on strong priors, which may be challenging to obtain due to the limited availability of tagging, genetic, or stable isotope data. While testing the effects of prior distributions on movement parameter estimation is beyond the scope of this study, we recommend that future research investigate the sensitivity of model performance to varying qualities of prior information in movement estimation.
+
+## Caveats and Future Research Recommendations
+
+We note that several assumptions made in our study could influence the overall findings. For instance, all fish were assumed to be reproductively isolated and to exhibit natal homing spawning migrations. This assumption ensured that surveys conducted during the spawning season had the best opportunity to collect information on $SSB$ for each population. However, mismatches between the timing of surveys and the spawning season could potentially affect management outcomes. Second, movement rates were assumed to be uniform across all ages. While ontogenetic movement may be biologically plausible in certain cases \citep{Waterhouse2014, Hanselman2015}, it remains unclear whether a more complex structure for NAA random effects (e.g., age-specific movement) could effectively capture differences in age-based movement dynamics. In this study, we modeled NAA random effects as IID deviations, which may have limited ability to account for model mis-specification. More flexible N NAA configurations, such as AR(1) processes across years or ages, or two-dimensional AR(1) (2D-AR1) structures across both years and ages, may enhance the ability of NAA random effects to capture more complex dynamics. Further investigation is needed to assess the broader applicability of NAA random effects under such scenarios.
+
+Another key assumption was that selectivity pattern in our estimation models was constrained to a logistic curve. While this assumption provided NAA random effects with the best opportunity to account for spatial heterogeneity caused by movement between regions, it restricted the ability of selectivity patterns to reflect movement dynamics, which are often characterized by a dome-shaped selectivity pattern in EMs that do not account for movement \citep{O'Boyle2016}. Moreover, incorporating random effects into the selectivity process may offer greater flexibility to account for the underlying movement dynamics, likely maximizing the benefits of using selectivity to absorb the movement process variation, despite a potential increased risk of bias in population estimates and reference points due to model misspecification \citep{Fisch2023, Li2024}. Thus, the management outcomes of these more flexible frameworks within state-space models remain poorly understood and require further investigation \citep{O'Boyle2016}. 
+
+Our approach to biological reference points and catch apportionment may also influence MSE performance by affecting management outcomes rather than assessment bias. Apportioning global biological reference points to regions introduces inherent challenges in comparing single-region and multi-region model outputs or harvest control rules. Thus, further work is needed to explore pros and cons of using regionally explicit versus globally apportioned biological reference points (e.g., separate vs. spatially disaggregated approaches), particularly under varying assumptions of movement dynamics among regions.
+
+Finally, fish biology (stock–recruitment relationship) and fleet characteristics (e.g., fishing selectivity) were assumed to differ slightly between populations/regions in the present study (see \autoref{para_tab}). However, relative impacts of these discrepancies, along with other biological (e.g., growth rates) and fishery characteristics, on model performance remain unclear and warrant further investigation to fully understand the potential of random effects in management outcomes. Our results are indicative of data-rich stocks with a known source for connectivity dynamics (natal homing), while alternative data quality and population dynamic assumptions may improve or degrade the utility of NAA random effects.
+  
+# Conclusion 
+
+While claims have been made that NAA random effects can account for other processes including movement, our study found that assessment models with NAA random effects outperformed their counterparts without them. However, NAA random effects could not fully capture movement dynamics, particularly under high levels of movement. Thus, models with NAA random effects provide a bridge between conventional panmictic stock assessments with no explicit movement processes and fully spatial state–space models that incorporate empirical tagging data to estimate movement rates. In cases where explicitly modeling movement dynamics is not feasible, NAA random effects offer a practical intermediate approach. The results of this study add to the growing body of literature suggesting that incorporating NAA random effects should be the default starting point in state–space stock assessments, as their inclusion leads to more accurate stock assessment and management-relevant estimates.
+  
+# Acknowledgements 
+
+This work was funded by NOAA Fisheries Northeast Fisheries Science Center (50%), Northwest Fisheries Science Center (25%), and Alaska Fisheries Science Center (25%). We acknowledge the support provided by Saltwater Inc. for facilitating Chengxue Li's contribution to this project. We are grateful to Christopher Legault for conducting NOAA internal review of the manuscript and to Dana Hanselman for his insightful contributions to the conceptualization of this study design. We also thank Microsoft Azure for providing high-performance computing resources for this study. We would also like to thank the Quahog Republic and the Midway Trap and Skeet Club for keeping the wheels adequately greased during the study design development. 
+
+# Competing interests statement
+
+One co-author, Daniel R. Goethel, serves as an Associate Editor for CJFAS, and another co-author, Timothy J. Miller, serves as a Guest Editor for CJFAS for this special issue.
+
+# CRediT authorship contribution statement
+
+**Chengxue Li:** Conceptualization, Methodology, Software, Writing - original draft, Formal analysis, Visualization.  
+
+**Jonathan J. Deroba:** Conceptualization, Funding acquisition, Supervision, Writing - review & editing.  
+
+**Aaron M. Berger:** Conceptualization, Writing - review & editing.  
+
+**Daniel R. Goethel:** Conceptualization, Writing - review & editing.
+
+**Brian J. Langseth:** Conceptualization, Writing - review & editing. 
+
+**Amy M. Schueller:** Conceptualization, Writing - review & editing.
+
+**Timothy J. Miller:** Software, Writing - review & editing.
+
+# Funding statement
+
+This work was funded by NOAA Fisheries Northeast Fisheries Science Center (50%), Northwest Fisheries Science Center (25%), and Alaska Fisheries Science Center (25%). 
+
+# Data availability statement 
+
+No empirical data were collected for this study. Data used for this study were produced through simulation. Code for all simulations is available at https://github.com/lichengxue/MSE_NAA_Project.
+
+# Tables
+
+```{=latex}
+\input{para_tab.tex}
+```
+
+
+```{=latex}
+\input{F_scenario_table.tex}
+```
+
+
+```{=latex}
+\input{EM_table.tex}
+```
+
+# Figures 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Movement_dynamics.PNG}
+\caption{Movement dynamics for high ($\text{OM}_{\text{high}}$) and low ($\text{OM}_{\text{low}}$) movement scenarios. Blue represents the population originating from the upper region and red represents the population originating from the lower region. The dashed arrow represents movement outside the spawning season, with thickness indicating the magnitude of the movement rate, while the solid curved arrow indicates natal homing movement.}
+\label{fig:movement_dynamics}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Combined_Figures.PNG}
+\caption{Overview of the 10 estimation models (EMs) used in the present study. The description of the model structure is shown in Table~2. The dashed black arrow in the $\text{SpE}_{\scriptscriptstyle \text{NAA,Est}}$ EM indicates that movement outside the spawning season was estimated using a prior, while the solid black arrow in the $\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$ EM indicates that movement outside the spawning season was fixed at the true value. The blue curved arrow in $\text{SpE}_{\scriptscriptstyle \text{NAA,Est}}$ and $\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$ EMs indicates natal homing movement.}
+\label{fig:EM_structure}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Performance_first_5_years_relative_OM_1.PNG}
+\caption{Relative difference in catch, $F$, and $SSB$ between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs over the first 5 years of the feedback period under the high movement scenario ($\text{OM}_{\text{high}}$). Each point represents the median across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:first_5yr_results}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Performance_last_5_years_relative_OM_1.PNG}
+\caption{Relative difference in catch, $F$, and $SSB$ between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs over the last 5 years of the feedback period under the high movement scenario ($\text{OM}_{\text{high}}$). Each point represents the median across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:last_5yr_results}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Catch_variation_OM1.PNG}
+\caption{Average annual catch variation (AACV) of each EM at both regional and global scales under the high movement scenario ($\text{OM}_{\text{high}}$). Each point represents the median across the 100 realizations (one value per realization), and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:aacv}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Probability_Overfished_Overfishing_OM1_MSY.PNG}
+\caption{Probability of $SSB < SSB_{MSY}$ and $F > F_{MSY}$ for each EM over the 30-year feedback period under the high movement scenario ($\text{OM}_{\text{high}}$). Each point represents the median across the 100 realizations (one value per realization), and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:Overfished_OM1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=\textheight]{Holistic_OM_1.PNG}
+\caption{Overall performance of each EM at the global scale under the high movement scenario ($\text{OM}_{\text{high}}$), including the following relative performance metrics: 1) long-term catch ($\text{Catch}_{\text{long}}$); 2) short-term catch ($\text{Catch}_{\text{short}}$); 3) long-term $SSB$ ($SSB_{\text{long}}$); 4) short-term $SSB$ ($SSB_{\text{short}}$); 5) probability of $F < F_{MSY}$ ($\text{P}_{F<F_{MSY}}$); 6) probability of $SSB > SSB_{MSY}$ ($\text{P}_{SSB>SSB_{MSY}}$); 7) overfishing status in the terminal year ($\text{OFG}_{\text{terminal}}$); 8) overfished status in the terminal year ($\text{OFD}_{\text{terminal}}$); and 9) average annual catch variation (AACV). Bars represent the median score across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). The number displayed in each panel represents the total score (sum of all medians for that EM) for the corresponding EM under that fishing scenario, with higher totals indicating better overall performance. The black dashed line separates the performance of each EM. EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:holistic_OM1}
+\end{figure}
+
+# Supplementary file
+
+## Methods {-}
+
+### Population Dynamics {-}
+
+For population $s$, the number-at-age $a$ that survived ($N_{S,s,a,t+\delta}$), were harvested from the fishery ($N_{H,s,a,t+\delta}$), and died from natural mortality ($N_{D,s,a,t+\delta}$) over the time interval $\delta$ are given by: 
+
+\setcounter{equation}{0}
+\begin{equation}
+\begin{aligned}
+N_{S,s,a,t+\delta} &= N_{s,a,t} S(s,a,\delta) = N_{s,a,t} e^{-Z_{s,a}\delta} \\
+N_{H,s,a,t+\delta} &= N_{s,a,t} H(s,a,\delta) = N_{s,a,t} \frac{F_{s,a}}{Z_{s,a}}\left(1 - e^{-Z_{s,a}\delta}\right) \\
+N_{D,s,a,t+\delta} &= N_{s,a,t} D(s,a,\delta) = N_{s,a,t} \frac{M_{s,a}}{Z_{s,a}}\left(1 - e^{-Z_{s,a}\delta}\right)
+\end{aligned}
+\end{equation}
+
+where $N_{s,a,t}$ is the number-at-age $a$ at time $t$ for population $s$; $S$, $H$, and $D$ represent the proportions (fractions) of individuals that survived, were harvested, or died from natural mortality, respectively, over the time interval $\delta$; $F_{t,a}$ and $M_{t,a}$ denote instantaneous rates of fishing mortality and natural mortality at age $a$ and time $t$, and $Z_{s,a}$ denotes total mortality rate, where $Z_{s,a} = F_{s,a} + M_{s,a}$.
+
+The probability transition matrix, when there is movement between regions, can be generalized as:
+
+\begin{equation}
+\mathbf{P}_{s,a,t,\delta} = \begin{bmatrix}
+ \mathbf{O}(s,a,\delta) & \mathbf{H}(s,a,\delta) & \mathbf{D}(s,a,\delta) \\
+ 0 & \mathbf{I}_{H} & 0 \\
+ 0 & 0 & \mathbf{I}_{D}
+\end{bmatrix}
+\end{equation}
+
+where $\mathbf{O}$ is the $n_R \times n_R$ matrix representing the combined probability of survival and movement between regions. Assuming movement occurs sequentially after survival, $\mathbf{O}$ is the product of the survival probability matrix ($\mathbf{S}$) and movement probability matrix $\mu$, such that $\mathbf{O} = \mathbf{S} \mu$. $\mathbf{H}$ is the $n_R \times n_F$ matrix representing proportions of individuals harvested by each fleet in each region, $\mathbf{D}$ is the $n_R \times n_R$ matrix representing proportions of individuals that died from natural mortality within each region, and $\mathbf{I}_{H}$ and $\mathbf{I}_{D}$, which have the same dimensions as $\mathbf{H}$ and $\mathbf{D}$), are identity matrices that ensure the overall dimensions of the probability transition matrix remain consistent when combined. If there is only one region and one fleet, these identity matrices reduce to scalars of 1.
+
+For population $s$, the total number-at-age $a$ at the end of time interval $\delta$ can be generalized as:
+
+\begin{equation}
+\mathbf{N}_{s,a,t+\delta} = \mathbf{P}(s,a,\delta)' \mathbf{N}_{s,a,t}
+\end{equation}
+
+where the numbers of individuals that survived, were harvested, and died from natural mortality are decomposed as:
+
+\begin{equation}
+\begin{aligned}
+\mathbf{N}_{S,s,a,t+\delta} &= \mathbf{O}(s,a,\delta)' \mathbf{N}_{s,a,t} \\
+\mathbf{N}_{H,s,a,t+\delta} &= \mathbf{H}(s,a,\delta)' \mathbf{N}_{s,a,t} \\
+\mathbf{N}_{D,s,a,t+\delta} &= \mathbf{D}(s,a,\delta)' \mathbf{N}_{s,a,t}
+\end{aligned}
+\end{equation}
+
+### Population Structure and Seasonality {-}
+
+A natal homing population structure is assumed in WHAM. Each population is associated with a natal region, and all fish originating in that  region must return there for spawning. Outside of the spawning season, fish can move between regions (see details in the sections on OM or EM movement dynamics). Seasonality is included to support the assumption of natal homing. Specifically, a number of time intervals within a year ($\Sigma_{i=1}^{n} \delta_i = 1$) are used to indicate movement dynamics prior to the spawning season, during the spawning season, and after the spawning season. The probability transition matrix for the entire year is a product of all "seasonal" matrices:
+
+\begin{equation}
+\mathbf{P}_{s,a,y} = \prod^{n}_{t=1} \mathbf{P}_{s,a,y,t}
+\end{equation}
+
+### Fishing Mortality ($F$) {-}
+
+${F}$ at age ${a}$ for fleet ${f}$ is calculated as a product of fully selected ${F}$ and selectivity-at-age (i.e., the separability assumption) for fleet ${f}$: $\tilde F_{f,a} = \tilde F \textit{Sel}_{f,a}$. In WHAM, a fully selected, total ${F}$ is the maximum of the total ${F}$-at-age summed across all fleets:
+
+\begin{equation}
+\begin{aligned}
+F_{\text{total},a,y} &= \sum_{i=1}^{n_f} F_{f_i,a,y} \\
+F_{\text{total},y} &= \operatorname*{argmax}_a F_{\text{total},a,y} \\
+\end{aligned}
+\end{equation}
+
+### Reference Points {-}
+
+The fully selected total $F$ defined above was used to estimate a single universal ${F}$ reference point applicable to all populations and regions. A 'static' SPR-based reference point was calculated by averaging all of the inputs (e.g., selectivity, natural mortality, movement, weight-at-age, maturity-at-age) over the most recent 5 model years for each region, except for recruitment, which was averaged over all model years for each region. 
+
+For $X\%$ SPR-based reference points, WHAM uses a Newton method to solve for the universal $F_{X\%}$ reference point:
+
+\begin{equation}
+\tilde{F}^{(i)} = \tilde{F}^{(i-1)} - \frac{g\left(\tilde{F}^{(i-1)}\right)}{\tilde{F}^{(i-1)}g'\left(\tilde{F}^{(i-1)}\right)}
+\end{equation}
+
+where $g(F)$ is the difference between the weighted spawning biomass per recruit at $F$ and $X\%$ of the weighted unfished spawning biomass per recruit:
+
+\begin{equation}
+g(F) = \sum_{s=1}^S w_s \left( \frac{\tilde{\tilde{SSB}}}{\tilde{R}(F)} - \frac{X}{100} \frac{\tilde{\tilde{SSB}}}{\tilde{R}(F=0)} \right)
+\end{equation}
+
+Here weights are determined by the average recruitment for different regions/populations:
+
+\begin{equation}
+w_i = \frac{\bar{R}_i}{\sum_{i=1}^{n_s} \bar{R}_i}
+\end{equation}
+
+The fully selected total $F$ reference point can be disaggregated to regional $F$ reference points, given the relative contribution of selectivity ($Sel$) at age $a$ from each fleet in each region $R$: 
+
+\begin{equation}
+F_{X\%_{\text{a},R}} = F_{X\%} \text{$Sel$}_{a,R}
+\end{equation}
+
+The regional $F_{X\%}$ (e.g., $F_{40\%}$) does not guarantee achieving 40% of region-specific SPR, but serve to collectively achieve 40% of SPR at the global scale. Regional $F$ reference points are not currently implemented, as a unique solution is not guaranteed in the presence of movement between regions. An analogous Newton method is used to solve for $F$ that maximizes yield for MSY-based reference points.
+
+\pagebreak
+
+\renewcommand{\thetable}{S\arabic{table}}
+\setcounter{table}{0}  
+
+```{=latex}
+\input{HCR_table.tex}
+```
+
+\renewcommand{\thetable}{S\arabic{table}}
+
+\renewcommand{\thefigure}{S\arabic{figure}}
+\setcounter{figure}{0}  
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Movement1.PNG}
+\caption{Simulated AR1 movement rates (from one replicate) under the high movement scenario ($\text{OM}_{\text{high}}$). The panels show time‐varying movement rates between regions, with green indicating movement from region 1 to region 2 and red indicating movement from region 2 to region 1. The same movement rates were applied in both the spring and winter seasons.}
+\label{fig:supp_movement1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Bias_Rec_OM_1.PNG}
+\caption{Relative bias in recruitment for region 1, region 2, and global recruitment from the first assessment model during the feedback period under the high movement scenario ($\text{OM}_{\text{high}}$). Each point represents the median across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_Bias_Rec_OM_1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Bias_SSB_OM_1.PNG}
+\caption{Relative bias in $SSB$ for region 1, region 2, and global $SSB$ from the first assessment model during the feedback period under the high movement scenario ($\text{OM}_{\text{high}}$). Each point represents the median across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_Bias_SSB_OM_1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Parameter_Estimates_OM_1.PNG}
+\caption{The mean recruitment parameter, recruitment standard deviation, and NAA standard deviation from the last assessment model during the feedback period under the high movement scenario ($\text{OM}_{\text{high}}$). Each point represents the median across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_Parameter_Estimates_OM_1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Catch_G_OM1.PNG}
+\caption{Relative difference in annual total catch between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs for each fishing history under the high movement scenario ($\text{OM}_{\text{high}}$). Each line represents the median trajectory across the 100 realizations, and the shaded area represents the interquartile range (40th–60th percentiles). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_annual_catch_G_OM1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Catch_1_OM1.PNG}
+\caption{Relative difference in annual catch in region 1 between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs for each fishing history under the high movement scenario ($\text{OM}_{\text{high}}$). Each line represents the median trajectory across the 100 realizations, and the shaded area represents the interquartile range (40th–60th percentiles). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_annual_catch_1_OM1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Catch_2_OM1.PNG}
+\caption{Relative difference in annual catch in region 2 between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs for each fishing history under the high movement scenario ($\text{OM}_{\text{high}}$). Each line represents the median trajectory across the 100 realizations, and the shaded area represents the interquartile range (40th–60th percentiles). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_annual_catch_2_OM1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{SSB_G_OM1.PNG}
+\caption{Relative difference in annual total $SSB$ between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs for each fishing history under the high movement scenario ($\text{OM}_{\text{high}}$). Each line represents the median trajectory across the 100 realizations, and the shaded area represents the interquartile range (40th–60th percentiles). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_SSB_G_OM1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{SSB_1_OM1.PNG}
+\caption{Relative difference in annual $SSB$ for region 1 between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs for each fishing history under the high movement scenario ($\text{OM}_{\text{high}}$). Each line represents the median trajectory across the 100 realizations, and the shaded area represents the interquartile range (40th–60th percentiles). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_SSB_1_OM1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{SSB_2_OM1.PNG}
+\caption{Relative difference in annual $SSB$ for region 2 between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs for each fishing history under the high movement scenario ($\text{OM}_{\text{high}}$). Each line represents the median trajectory across the 100 realizations, and the shaded area represents the interquartile range (40th–60th percentiles). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_SSB_2_OM1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Probability_Overfished_Overfishing_OM1_SPR.PNG}
+\caption{Probability of $SSB < SSB_{40\%}$ and $F > F_{40\%}$ for each EM over the 30-year feedback period under the high movement scenario ($\text{OM}_{\text{high}}$). Each point represents the median across the 100 realizations (one value per realization), and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:Overfished_OM1_SPR}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Population_Status_OM_1_MSY.PNG}
+\caption{Terminal-year status of $F$ and $SSB$ at the global scale for each EM under the high movement scenario ($\text{OM}_{\text{high}}$). Each point represents the median across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). The vertical dashed line indicates the threshold of overfished ($SSB_{T}/SSB_{MSY_{T}} < 0.5$), and the horizontal dashed line indicates the threshold of overfishing ($F_{T}/F_{MSY_{T}} > 1$). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_population_status_G_OM_1_MSY}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Population_Status_OM_1_SPR.PNG}
+\caption{Terminal-year status of $F$ and $SSB$ at the global scale for each EM under the high movement scenario ($\text{OM}_{\text{high}}$). Each point represents the median across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). The vertical dashed line indicates the threshold of overfished ($SSB_{T}/SSB_{40\%_{T}} < 0.5$), and the horizontal dashed line indicates the threshold of overfishing ($F_{T}/F_{40\%_{T}} > 1$). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_population_status_G_OM_1_SPR}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=\textheight]{Holistic_OM_R1_1.PNG}
+\caption{Overall performance of each EM in region 1 under the high movement scenario ($\text{OM}_{\text{high}}$), including the following relative performance metrics: 1) long-term catch ($\text{Catch}_{\text{long}}$); 2) short-term catch ($\text{Catch}_{\text{short}}$); 3) long-term $SSB$ ($SSB_{\text{long}}$); 4) short-term $SSB$ ($SSB_{\text{short}}$); 5) probability of $F < F_{MSY}$ ($\text{P}_{F<F_{MSY}}$); 6) probability of $SSB > SSB_{MSY}$ ($\text{P}_{SSB>SSB_{MSY}}$); 7) overfishing status in the terminal year ($\text{OFG}_{\text{terminal}}$); 8) overfished status in the terminal year ($\text{OFD}_{\text{terminal}}$); and 9) average annual catch variation (AACV). Bars represent the median score across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). The number displayed in each panel represents the total score (sum of all medians for that EM) for the corresponding EM under that fishing scenario, with higher totals indicating better overall performance. The black dashed line separates the performance of each EM. EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_holistic1_R1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=\textheight]{Holistic_OM_R2_1.PNG}
+\caption{Overall performance of each EM in region 2 under the high movement scenario ($\text{OM}_{\text{high}}$), including the following relative performance metrics: 1) long-term catch ($\text{Catch}_{\text{long}}$); 2) short-term catch ($\text{Catch}_{\text{short}}$); 3) long-term $SSB$ ($SSB_{\text{long}}$); 4) short-term $SSB$ ($SSB_{\text{short}}$); 5) probability of $F < F_{MSY}$ ($\text{P}_{F<F_{MSY}}$); 6) probability of $SSB > SSB_{MSY}$ ($\text{P}_{SSB>SSB_{MSY}}$); 7) overfishing status in the terminal year ($\text{OFG}_{\text{terminal}}$); 8) overfished status in the terminal year ($\text{OFD}_{\text{terminal}}$); and 9) average annual catch variation (AACV). Bars represent the median score across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). The number displayed in each panel represents the total score (sum of all medians for that EM) for the corresponding EM under that fishing scenario, with higher totals indicating better overall performance. The black dashed line separates the performance of each EM. EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_holistic1_R2}
+\end{figure}
+
+% --- Low movement section continues here ---
+  
+  \begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Movement2.PNG}
+\caption{Simulated AR1 movement rates (from one replicate) under the low movement scenario ($\text{OM}_{\text{low}}$). The panels show time‐varying movement rates between regions, with green indicating movement from region 1 to region 2 and red indicating movement from region 2 to region 1. The same movement rates were applied in both the spring and winter seasons.}
+\label{fig:supp_movement2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Bias_Rec_OM_2.PNG}
+\caption{Relative bias in recruitment for region 1, region 2, and global recruitment from the first assessment model during the feedback period under the low movement scenario ($\text{OM}_{\text{low}}$). Each point represents the median across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_Bias_Rec_OM_2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Bias_SSB_OM_2.PNG}
+\caption{Relative bias in $SSB$ for region 1, region 2, and global $SSB$ from the first assessment model during the feedback period under the low movement scenario ($\text{OM}_{\text{low}}$). Each point represents the median across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_Bias_SSB_OM_2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Parameter_Estimates_OM_2.PNG}
+\caption{The mean recruitment parameter, recruitment standard deviation and NAA standard deviation from the last assessment model during the feedback period under the low movement scenario ($\text{OM}_{\text{low}}$). Each point represents the median across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_Parameter_Estimates_OM_2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Catch_G_OM2.PNG}
+\caption{Relative difference in annual total catch between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs for each fishing history under the low movement scenario ($\text{OM}_{\text{low}}$). Each line represents the median trajectory across the 100 realizations, and the shaded area represents the interquartile range (40th–60th percentiles). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_annual_catch_G_OM2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Catch_1_OM2.PNG}
+\caption{Relative difference in annual catch in region 1 between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs for each fishing history under the low movement scenario ($\text{OM}_{\text{low}}$). Each line represents the median trajectory across the 100 realizations, and the shaded area represents the interquartile range (40th–60th percentiles). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_annual_catch_1_OM2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Catch_2_OM2.PNG}
+\caption{Relative difference in annual catch in region 2 between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs for each fishing history under the low movement scenario ($\text{OM}_{\text{low}}$). Each line represents the median trajectory across the 100 realizations, and the shaded area represents the interquartile range (40th–60th percentiles). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_annual_catch_2_OM2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{SSB_G_OM2.PNG}
+\caption{Relative difference in annual total $SSB$ between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs for each fishing history under the low movement scenario ($\text{OM}_{\text{low}}$). Each line represents the median trajectory across the 100 realizations, and the shaded area represents the interquartile range (40th–60th percentiles). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_SSB_G_OM2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{SSB_1_OM2.PNG}
+\caption{Relative difference in annual $SSB$ for region 1 between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs for each fishing history under the low movement scenario ($\text{OM}_{\text{low}}$). Each line represents the median trajectory across the 100 realizations, and the shaded area represents the interquartile range (40th–60th percentiles). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_SSB_1_OM2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{SSB_2_OM2.PNG}
+\caption{Relative difference in annual $SSB$ for region 2 between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs for each fishing history under the low movement scenario ($\text{OM}_{\text{low}}$). Each line represents the median trajectory across the 100 realizations, and the shaded area represents the interquartile range (40th–60th percentiles). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_SSB_2_OM2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Performance_first_5_years_relative_OM_2.PNG}
+\caption{Relative difference in catch, $F$, and $SSB$ between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs over the first 5 years of the feedback period under the low movement scenario ($\text{OM}_{\text{low}}$). Each point represents the median across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_first_5yr_results_OM2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Performance_last_5_years_relative_OM_2.PNG}
+\caption{Relative difference in catch, $F$, and $SSB$ between the baseline EM ($\text{SpE}_{\scriptscriptstyle \text{NAA,Fix}}$) and other EMs over the last 5 years of the feedback period under the low movement scenario ($\text{OM}_{\text{low}}$). Each point represents the median across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_last_5yr_results_OM2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Catch_variation_OM2.PNG}
+\caption{Average annual catch variation (AACV) of each EM at both regional and global scales under the low movement scenario ($\text{OM}_{\text{low}}$). Each point represents the median across the 100 realizations (one value per realization), and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_aacv_OM2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Probability_Overfished_Overfishing_OM2_MSY.PNG}
+\caption{Probability of $SSB < SSB_{MSY}$ and $F > F_{MSY}$ for each EM over the 30-year feedback period under the low movement scenario ($\text{OM}_{\text{low}}$). Each point represents the median across the 100 realizations (one value per realization), and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_Overfished_OM2_MSY}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Probability_Overfished_Overfishing_OM2_SPR.PNG}
+\caption{Probability of $SSB < SSB_{40\%}$ and $F > F_{40\%}$ for each EM over the 30-year feedback period under the low movement scenario ($\text{OM}_{\text{low}}$). Each point represents the median across the 100 realizations (one value per realization), and error bars represent the interquartile range (25th–75th percentiles). EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_Overfished_OM2_SPR}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Population_Status_OM_2_MSY.PNG}
+\caption{Terminal-year status of $F$ and $SSB$ at the global scale for each EM under the low movement scenario ($\text{OM}_{\text{low}}$). Each point represents the median across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). The vertical dashed line indicates the threshold of overfished ($SSB_{T}/SSB_{MSY_{T}} < 0.5$), and the horizontal dashed line indicates the threshold of overfishing ($F_{T}/F_{MSY_{T}} > 1$). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_population_status2_MSY}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Population_Status_OM_2_SPR.PNG}
+\caption{Terminal-year status of $F$ and $SSB$ at the global scale for each EM under the low movement scenario ($\text{OM}_{\text{low}}$). Each point represents the median across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). The vertical dashed line indicates the threshold of overfished ($SSB_{T}/SSB_{40\%_{T}} < 0.5$), and the horizontal dashed line indicates the threshold of overfishing ($F_{T}/F_{40\%_{T}} > 1$). The performance of EMs with and without NAA random effects is shown separately for better comparison. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_population_status2_SPR}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=\textheight]{Holistic_OM_2.PNG}
+\caption{Overall performance of each EM at the global scale under the low movement scenario ($\text{OM}_{\text{low}}$), including the following relative performance metrics: 1) long-term catch ($\text{Catch}_{\text{long}}$); 2) short-term catch ($\text{Catch}_{\text{short}}$); 3) long-term $SSB$ ($SSB_{\text{long}}$); 4) short-term $SSB$ ($SSB_{\text{short}}$); 5) probability of $F < F_{MSY}$ ($\text{P}_{F<F_{MSY}}$); 6) probability of $SSB > SSB_{MSY}$ ($\text{P}_{SSB>SSB_{MSY}}$); 7) overfishing status in the terminal year ($\text{OFG}_{\text{terminal}}$); 8) overfished status in the terminal year ($\text{OFD}_{\text{terminal}}$); and 9) average annual catch variation (AACV). Bars represent the median score across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). The number displayed in each panel represents the total score (sum of all medians for that EM) for the corresponding EM under that fishing scenario, with higher totals indicating better overall performance. The black dashed line separates the performance of each EM. EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_holistic2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=\textheight]{Holistic_OM_R1_2.PNG}
+\caption{Overall performance of each EM in region 1 under the low movement scenario ($\text{OM}_{\text{low}}$), including the following relative performance metrics: 1) long-term catch ($\text{Catch}_{\text{long}}$); 2) short-term catch ($\text{Catch}_{\text{short}}$); 3) long-term $SSB$ ($SSB_{\text{long}}$); 4) short-term $SSB$ ($SSB_{\text{short}}$); 5) probability of $F < F_{MSY}$ ($\text{P}_{F<F_{MSY}}$); 6) probability of $SSB > SSB_{MSY}$ ($\text{P}_{SSB>SSB_{MSY}}$); 7) overfishing status in the terminal year ($\text{OFG}_{\text{terminal}}$); 8) overfished status in the terminal year ($\text{OFD}_{\text{terminal}}$); and 9) average annual catch variation (AACV). Bars represent the median score across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). The number displayed in each panel represents the total score (sum of all medians for that EM) for the corresponding EM under that fishing scenario, with higher totals indicating better overall performance. The black dashed line separates the performance of each EM. EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_holistic2_R1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=\textheight]{Holistic_OM_R2_2.PNG}
+\caption{Overall performance of each EM in region 2 under the low movement scenario ($\text{OM}_{\text{low}}$), including the following relative performance metrics: 1) long-term catch ($\text{Catch}_{\text{long}}$); 2) short-term catch ($\text{Catch}_{\text{short}}$); 3) long-term $SSB$ ($SSB_{\text{long}}$); 4) short-term $SSB$ ($SSB_{\text{short}}$); 5) probability of $F < F_{MSY}$ ($\text{P}_{F<F_{MSY}}$); 6) probability of $SSB > SSB_{MSY}$ ($\text{P}_{SSB>SSB_{MSY}}$); 7) overfishing status in the terminal year ($\text{OFG}_{\text{terminal}}$); 8) overfished status in the terminal year ($\text{OFD}_{\text{terminal}}$); and 9) average annual catch variation (AACV). Bars represent the median score across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). The number displayed in each panel represents the total score (sum of all medians for that EM) for the corresponding EM under that fishing scenario, with higher totals indicating better overall performance. The black dashed line separates the performance of each EM. EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:supp_holistic2_R2}
+\end{figure}
+
+
+\renewcommand{\thefigure}{\arabic{figure}}
+
+```{=html}
+<!--
+# CRediT authorship contribution statement {-}
+
+**Chengxue Li:** Conceptualization, Methodology, Writing - original draft, Formal analysis, Visualization.
+ -->
+```
+\pagebreak
+
+\bibliography{paper}
+
+::: {#refs}
+:::
+
+\pagebreak

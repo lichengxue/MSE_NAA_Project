@@ -2631,6 +2631,22 @@ custom_labeller <- labeller(
   OM = label_parsed
 )
 
+sum_data$EM = factor(sum_data$EM, levels = c("EM5_Fix",
+                                             "EM5_Est",
+                                             "EM4_NAA",
+                                             "EM3_NAA",
+                                             "EM2_NAA",
+                                             "EM1_NAA",
+                                             "EM4_noNAA",
+                                             "EM3_noNAA",
+                                             "EM2_noNAA",
+                                             "EM1_noNAA"))
+
+position_dodge_val = position_dodge(width = 0.9)
+custom_labeller <- labeller(
+  OM = label_parsed
+)
+
 sum_data$Index = factor(sum_data$Index, levels = rev(c("Long_term_Catch",
                                                        "Short_term_Catch",
                                                        "Long_term_SSB",
@@ -2652,6 +2668,7 @@ legend_labels <- c(
   "SSB/SSBMSY" = expression(OFD[terminal]),
   "AAV_Catch" = expression(AACV)
 )
+
 
 # Calculate the sum of scores for each EM and OM
 sum_data2 <- sum_data %>%
@@ -2680,28 +2697,30 @@ for (i in 1:4) {
     geom_errorbar(aes(xmin = Q1, xmax = Q3),
                   position = position_dodge_val, width = 0.2, size = 0.5, alpha = 0.5) +  # IQR error bars
     facet_wrap(~OM, labeller = custom_labeller) +
-    scale_fill_manual(values = my_colors, labels = legend_labels) +
-    scale_color_manual(values = my_colors, labels = legend_labels) +
-    scale_y_discrete(labels = c(
-      "EM1_NAA"   = expression(PAN[NAA]),
-      "EM1_noNAA" = expression(PAN[noNAA]),
-      "EM2_NAA"   = expression(FAA[NAA]),
-      "EM2_noNAA" = expression(FAA[noNAA]),
-      "EM3_NAA"   = expression(SEP[NAA]),
-      "EM3_noNAA" = expression(SEP[noNAA]),
-      "EM4_NAA"   = expression(SpD[NAA]),
-      "EM4_noNAA" = expression(SpD[noNAA]),
-      "EM5_Est"   = expression(SpE[NAA * "," * Est]),
-      "EM5_Fix"   = expression(SpE[NAA * "," * Fix])
-    )) +
+    scale_fill_manual(values = my_colors,
+                      labels = legend_labels,
+                      guide = guide_legend(reverse = TRUE)) +
+    scale_color_manual(values = my_colors,
+                       labels = legend_labels,
+                       guide = "none") + 
+    scale_y_discrete(limits = levels(sum_data$EM),
+                     labels = c(
+                       "EM1_NAA"   = expression(PAN[NAA]),
+                       "EM1_noNAA" = expression(PAN[noNAA]),
+                       "EM2_NAA"   = expression(FAA[NAA]),
+                       "EM2_noNAA" = expression(FAA[noNAA]),
+                       "EM3_NAA"   = expression(SEP[NAA]),
+                       "EM3_noNAA" = expression(SEP[noNAA]),
+                       "EM4_NAA"   = expression(SpD[NAA]),
+                       "EM4_noNAA" = expression(SpD[noNAA]),
+                       "EM5_Est"   = expression(SpE[NAA * "," * Est]),
+                       "EM5_Fix"   = expression(SpE[NAA * "," * Fix])
+                     )) +
     labs(
       title = "Holistic Model Performance", 
       x = "Score", 
-      y = "Estimation Model"
-    ) +
-    guides(
-      fill  = guide_legend(title = "Metric"),
-      color = guide_legend(title = "Metric")
+      y = "Estimation Model", 
+      fill = "Metric"   # <- legend title updated here
     ) +
     theme_bw() +
     theme(
@@ -2727,7 +2746,7 @@ for (i in 1:4) {
     geom_rect(data = data.frame(ymin = c(0.5),
                                 ymax = c(6.5)),
               aes(ymin = ymin, ymax = ymax, xmin = -Inf, xmax = Inf),
-              fill = "lightgrey", alpha = 0.3, inherit.aes = FALSE)  +
+              fill = "lightgrey", alpha = 0.3, inherit.aes = FALSE) +
     geom_text(data = summary_data2,
               aes(x = 0.95, y = EM, label = paste(Total_Score)),
               inherit.aes = FALSE,
@@ -2839,14 +2858,14 @@ custom_labeller <- labeller(
 )
 
 sum_data$Index = factor(sum_data$Index, levels = rev(c("Long_term_Catch",
-                                                       "Short_term_Catch",
-                                                       "Long_term_SSB",
-                                                       "Short_term_SSB",
-                                                       "P_OFG",
-                                                       "P_OFD",
-                                                       "F/FMSY",
-                                                       "SSB/SSBMSY",
-                                                       "AAV_Catch")))
+                                                   "Short_term_Catch",
+                                                   "Long_term_SSB",
+                                                   "Short_term_SSB",
+                                                   "P_OFG",
+                                                   "P_OFD",
+                                                   "F/FMSY",
+                                                   "SSB/SSBMSY",
+                                                   "AAV_Catch")))
 
 legend_labels <- c(
   "Short_term_Catch" = expression(Catch[short]),
@@ -2887,20 +2906,25 @@ for (i in 1:4) {
     geom_errorbar(aes(xmin = Q1, xmax = Q3),
                   position = position_dodge_val, width = 0.2, size = 0.5, alpha = 0.5) +  # IQR error bars
     facet_wrap(~OM, labeller = custom_labeller) +
-    scale_fill_manual(values = my_colors, labels = legend_labels) +
-    scale_color_manual(values = my_colors, labels = legend_labels, guide = "none") + # remove duplicate legend
-    scale_y_discrete(labels = c(
-      "EM1_NAA"   = expression(PAN[NAA]),
-      "EM1_noNAA" = expression(PAN[noNAA]),
-      "EM2_NAA"   = expression(FAA[NAA]),
-      "EM2_noNAA" = expression(FAA[noNAA]),
-      "EM3_NAA"   = expression(SEP[NAA]),
-      "EM3_noNAA" = expression(SEP[noNAA]),
-      "EM4_NAA"   = expression(SpD[NAA]),
-      "EM4_noNAA" = expression(SpD[noNAA]),
-      "EM5_Est"   = expression(SpE[NAA * "," * Est]),
-      "EM5_Fix"   = expression(SpE[NAA * "," * Fix])
-    )) +
+    scale_fill_manual(values = my_colors,
+                      labels = legend_labels,
+                      guide = guide_legend(reverse = TRUE)) +
+    scale_color_manual(values = my_colors,
+                       labels = legend_labels,
+                       guide = "none") + 
+    scale_y_discrete(limits = levels(sum_data$EM),
+                     labels = c(
+                       "EM1_NAA"   = expression(PAN[NAA]),
+                       "EM1_noNAA" = expression(PAN[noNAA]),
+                       "EM2_NAA"   = expression(FAA[NAA]),
+                       "EM2_noNAA" = expression(FAA[noNAA]),
+                       "EM3_NAA"   = expression(SEP[NAA]),
+                       "EM3_noNAA" = expression(SEP[noNAA]),
+                       "EM4_NAA"   = expression(SpD[NAA]),
+                       "EM4_noNAA" = expression(SpD[noNAA]),
+                       "EM5_Est"   = expression(SpE[NAA * "," * Est]),
+                       "EM5_Fix"   = expression(SpE[NAA * "," * Fix])
+                     )) +
     labs(
       title = "Holistic Model Performance", 
       x = "Score", 
@@ -3042,14 +3066,14 @@ custom_labeller <- labeller(
 )
 
 sum_data$Index = factor(sum_data$Index, levels = rev(c("Long_term_Catch",
-                                                       "Short_term_Catch",
-                                                       "Long_term_SSB",
-                                                       "Short_term_SSB",
-                                                       "P_OFG",
-                                                       "P_OFD",
-                                                       "F/FMSY",
-                                                       "SSB/SSBMSY",
-                                                       "AAV_Catch")))
+                                                   "Short_term_Catch",
+                                                   "Long_term_SSB",
+                                                   "Short_term_SSB",
+                                                   "P_OFG",
+                                                   "P_OFD",
+                                                   "F/FMSY",
+                                                   "SSB/SSBMSY",
+                                                   "AAV_Catch")))
 
 legend_labels <- c(
   "Short_term_Catch" = expression(Catch[short]),
@@ -3091,20 +3115,25 @@ for (i in 1:4) {
     geom_errorbar(aes(xmin = Q1, xmax = Q3),
                   position = position_dodge_val, width = 0.2, size = 0.5, alpha = 0.5) +  # IQR error bars
     facet_wrap(~OM, labeller = custom_labeller) +
-    scale_fill_manual(values = my_colors, labels = legend_labels) +
-    scale_color_manual(values = my_colors, labels = legend_labels, guide = "none") + # remove duplicate legend
-    scale_y_discrete(labels = c(
-      "EM1_NAA"   = expression(PAN[NAA]),
-      "EM1_noNAA" = expression(PAN[noNAA]),
-      "EM2_NAA"   = expression(FAA[NAA]),
-      "EM2_noNAA" = expression(FAA[noNAA]),
-      "EM3_NAA"   = expression(SEP[NAA]),
-      "EM3_noNAA" = expression(SEP[noNAA]),
-      "EM4_NAA"   = expression(SpD[NAA]),
-      "EM4_noNAA" = expression(SpD[noNAA]),
-      "EM5_Est"   = expression(SpE[NAA * "," * Est]),
-      "EM5_Fix"   = expression(SpE[NAA * "," * Fix])
-    )) +
+    scale_fill_manual(values = my_colors,
+                      labels = legend_labels,
+                      guide = guide_legend(reverse = TRUE)) +
+    scale_color_manual(values = my_colors,
+                       labels = legend_labels,
+                       guide = "none") + 
+    scale_y_discrete(limits = levels(sum_data$EM),
+                     labels = c(
+                       "EM1_NAA"   = expression(PAN[NAA]),
+                       "EM1_noNAA" = expression(PAN[noNAA]),
+                       "EM2_NAA"   = expression(FAA[NAA]),
+                       "EM2_noNAA" = expression(FAA[noNAA]),
+                       "EM3_NAA"   = expression(SEP[NAA]),
+                       "EM3_noNAA" = expression(SEP[noNAA]),
+                       "EM4_NAA"   = expression(SpD[NAA]),
+                       "EM4_noNAA" = expression(SpD[noNAA]),
+                       "EM5_Est"   = expression(SpE[NAA * "," * Est]),
+                       "EM5_Fix"   = expression(SpE[NAA * "," * Fix])
+                     )) +
     labs(
       title = "Holistic Model Performance", 
       x = "Score", 

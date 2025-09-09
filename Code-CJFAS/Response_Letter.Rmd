@@ -1,0 +1,468 @@
+---
+title: "Response to Reviews: CJFAS-2025-0092 — Random effects on numbers-at-age transitions implicitly account for movement dynamics and improve stock assessment and management"
+author: "Authors: Li et al."
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+    latex_engine: xelatex
+fontsize: 11pt
+geometry: margin=1in
+header-includes:
+  - \usepackage{float}
+  - \usepackage{xcolor}
+  - \newenvironment{bluepar}{\par\color{blue}}{\par}
+---
+
+\newpage
+
+# *Cover Letter to the Associate Editor* {-}
+
+Dear Associate Editor,  
+
+We are pleased to submit our revised manuscript entitled  
+**"Random effects on numbers-at-age transitions implicitly account for movement dynamics and improve stock assessment and management"** (CJFAS-2025-0092).  
+
+We are grateful to you and the reviewers for the constructive feedback. We have carefully considered all comments and substantially revised the manuscript. The major revisions include:  
+
+- **Clarification of methods and equations**  
+- **Sensitivity analyses and robustness checks**  
+- **Model structure clarifications**  
+- **Revised figures and captions**  
+- **Improved conclusions and implications**  
+
+Minor edits were also made throughout the manuscript to correct wording, grammar, figure references, and reference formatting.
+
+We believe these revisions have substantially strengthened the manuscript and improved its accessibility to a broader readership. We thank you again for your time and consideration, and we look forward to your assessment of our revised submission.  
+
+Sincerely,  
+Li et al.  
+
+\newpage
+
+# Reviewer Comments and Author Responses
+
+## Reviewer 1 Comments
+
+**Major Comment 1**  
+> What do “G” and “D” stand for in OFG and OFD (lines 271 and 272)? These indices also appear in Figure 7. Why not add a Table with a list of the indices, since they appear in Table 7, and how the Score of each index is calculated (is a high value good or bad?). Figure 7 uses “Index” in its legend, but the text talks about “Performance Metrics”, be consistent throughout the article. Having a Table would also simplify the caption of Figure 7.  
+
+**Response**  
+\begin{bluepar}
+Thank you for this helpful comment. We clarified in the caption of Figure 7 (also in the Section 2.4.3) that OFG stands for OverFishinG and OFD stands for OverFisheD. Although we appreciate the suggestion of adding a table, we think it is clear for readers to interpret each figure without needing to cross-reference another table for abbreviations/acronyms. We have explained how to calculate these metrics in the caption of Figure 7, and clarified that a higher value indicates better performance. We also changed the legend title from "Index" to "Metric" to ensure consistency.
+\end{bluepar}
+
+\vspace{1cm}
+
+**Major Comment 2**  
+> In Section 2.2, no mention is made of how movement is handled in the operating models, and I realize that section 2.2.3 is exclusively about movement dynamics. But why not also add movement to the last sentence of 2.2?  
+
+**Response**  
+
+\begin{bluepar}
+**Response**
+
+\begin{bluepar}
+Since this study primarily focuses on NAA transitions as potential aliases for movement, we now have two sections after addressing the reviewers comment — Section 2.2.3 (NAA transitions) and Section 2.2.4 (Movement dynamics) — that explicitly describe their settings in the OM. We think they should be discussed as subcategories under the same upper-level category (OM) as fishing history, biological information, fleets, and surveys, but kept as separate subsections for clarity.
+\end{bluepar}
+
+\end{bluepar}
+
+\vspace{1cm}
+
+**Minor Comment 1**  
+> Page 3, line 74 “may not varying” should be “may not be varying”.  
+
+**Response**  
+\textcolor{blue}{Fixed.}
+
+\vspace{1cm}
+
+**Major Comment 3**  
+> How many parameters are estimated by each estimation model, and was there any exploration of comparing these models, and how they would stand to a model selection process based on AIC values? In Section 2.3, when NAA random effects are included, how many more parameters are estimated and how does it impact the complexity of model fitting? While I understand that models of different complexities are to be compared against simulated data, it would be useful to document the number of parameters that are estimated in the different models, and how that compares with the number of available simulated observations. This information could perhaps be added to Table S1?  
+
+**Response**  
+
+\begin{bluepar}
+We agree with this comment. In the revised manuscript, we specifically note in Section 2.3: "When NAA random effects were included in the EM, they were modeled as independent and identically distributed (IID) normal ($\mathcal{N}$) random effects in log space. In this case, only a single additional variance parameter ($\sigma_{NAA}$) is estimated, representing variability in the NAA transitions for that population within each region. Recruitment in all EMs was likewise modeled as IID normal random effects in log space."
+\end{bluepar}
+
+\vspace{1cm}
+
+**Major Comment 4**  
+> In Section 2.4, the authors state that the assessments use the most recent 20 years of data available. Why not use all the data available to that point instead? What is the purpose of not using data beyond this 20 year time window?  
+
+**Response**
+
+\begin{bluepar}
+Due to limited computational resources at the center, we compromised by using the most recent 20 years of data. We conducted sensitivity analyses to ensure the results were not driven by the length of the time series used in this study. These analyses indicated only small differences in convergence rates and parameter estimates of the EMs when the number of years of input data was increased beyond 20, consistent with findings in Li et al. (2018).
+\end{bluepar}
+
+\vspace{1cm}
+
+**Major Comment 5**  
+> Lines 274 to 277: what is the purpose of the weighting described here?  
+
+**Response**  
+
+\begin{bluepar}
+We added clarification on the purpose of weighting in lines 306–309 of the revised manuscript: “The annual global reference points ($F_{MSY_{y}}$ and $SSB_{MSY_{y}}$) were used for calculating some of the above performance metrics (Miller et al., in Press), with global values obtained as a weighted sum, where weights were based on the mean of realized annual recruitments for each population within each replicate.” In addition, the full description of the weighting procedure is provided in the supplementary material (Equations 8–9).
+\end{bluepar}
+
+\vspace{1cm}
+
+**Major Comment 6**  
+> In the Results section, the first two paragraphs use “For simplicity”. Could the authors explain what exactly is made simpler? The endless ability to produce results when using a closed simulation framework means that a large number of those results could be presented in figures, so decisions are made to select the key findings. The selection of Figures 3 to 7 followed a thought process that the authors went through, and it would be great to add a few sentences about this. Figure 1 describes 2 OM versions. Figure 2 presents the 5 different estimation models with and without random effects. It thus follows that figures 3 and 4 have 10-1=9 different entries on the x axis. The 3 columns used to compare the fishing exploitation regimes considered are shared by Figures 3 to 7. Is the order of the x axis based on model complexity increasing from left to right? If so, state that in the figure caption.  
+
+**Response**  
+
+\begin{bluepar}
+We rewrote the first two paragraphs of the Results section to explicitly state the rationale for focusing on a subset of representative cases (lines 324–332): "For clarity and space, we focused the discussion on a subset of representative cases. Specifically, we excluded further discussion of the $\text{SpE}_{\scriptscriptstyle \text{NAA,Est}}$ EM since its results closely mirrored those of the baseline EM. We also emphasized results for $\text{OM}_{\text{high}}$ rather than $\text{OM}_{\text{low}}$, because both produced qualitatively consistent outcomes but $\text{OM}_{\text{high}}$ highlighted differences among EMs more clearly. Results of $\text{OM}_{\text{low}}$ generally aligned with those of $\text{OM}_{\text{high}}$, but performance metrics among EMs were less distinct due to lower movement rates. Additionally, $\text{EMs}_{\scriptscriptstyle \text{NAA}}$ under the $\text{OM}_{\text{low}}$ scenario generally performed similarly to the baseline EM. A brief summary of the $\text{OM}_{\text{low}}$ results is included at the end of this section, with further detail in the supplementary material (Figures S16–S35)."
+
+We believe that the Results section is already structured to guide readers clearly through the main findings, and therefore additional explanatory sentences about the figure selection process are not necessary. Regarding Figures 3–7, we note that the order of estimation models on the x-axis is not strictly based on model complexity, as the SEP and SpD models are of relatively similar complexity. For this reason, we chose not to label the axis as increasing in model complexity.
+\end{bluepar}
+
+\vspace{1cm}
+
+**Major Comment 7**  
+> Why not combine figures 5 and 6 into a single figure? They share the same x axis and could be grouped together. The figure captions for both of these figures are insufficient. They do not describe the groupings used for columns and rows. In figure 5, what are the 3 different rows? I deduce that it corresponds to region 1, region 2 and global, but this information should appear in the caption. Wouldn’t Figure 5 be easier to interpret if the same y axis limits were shared by the different panels? That way the level of catch variation could be compared for the different estimation models and also between the different groupings presented.  
+
+**Response**  
+\begin{bluepar}
+We chose to keep Figures 5 and 6 as separate panels because they illustrate two distinct types of performance metrics: Figure 5 focuses on catch variation, while Figure 6 presents probabilities of being overfished and experiencing overfishing. We believe that keeping these metrics separate makes it easier for readers to interpret the results without conflating different aspects of model performance.
+
+To address the reviewer’s concern about caption clarity, we expanded the captions of both figures to explicitly describe the grouping structure. In particular, we now state that the three columns in Figures 4-7 correspond to three fishing scenarios: Adaptive ($\mathrm{F}_A$), Unsustainable ($\mathrm{F}_U$), and Contrasting ($\mathrm{F}_C$)..
+
+Regarding y-axis scaling, we chose not to standardize the axis limits across panels because doing so would blur important patterns specific to each metric. Using tailored axis limits allows the variation within each metric to be displayed more clearly.
+\end{bluepar}
+
+\vspace{1cm}
+
+**Major Comment 8**  
+> Figure 7 brings it all together and has the 3 different fishing scenarios as columns, the 10 estimation models as rows, but now the colors are associated with the performance indices. The order of the indices in the legend on the right of the figure should be the same as in the panels, they are currently in opposite order. I believe that this will improve the readability of this figure. There is some shading added to separate the NAA and noNAA estimation models, please state that in the captions. Same comments for Supplementary figures S14, S15, S33, S34 and S35.  
+
+**Response**  
+\textcolor{blue}{We have made a substantial improvement in the readability of the figure and its caption. An example is shown below, and the same changes have been applied to all holistic performance figures.}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=\textheight]{Holistic_OM_1.PNG}
+\caption{Overall performance of each EM at the global scale under the high movement scenario ($\text{OM}_{\text{high}}$), including the following relative performance metrics: 1) long-term catch ($\text{Catch}_{\text{long}}$); 2) short-term catch ($\text{Catch}_{\text{short}}$); 3) long-term $SSB$ ($SSB_{\text{long}}$); 4) short-term $SSB$ ($SSB_{\text{short}}$); 5) probability of $F < F_{MSY}$ ($\text{P}_{F<F_{MSY}}$); 6) probability of $SSB > SSB_{MSY}$ ($\text{P}_{SSB>SSB_{MSY}}$); 7) overfishing status in the terminal year ($\text{OFG}_{\text{terminal}}$); 8) overfished status in the terminal year ($\text{OFD}_{\text{terminal}}$); and 9) average annual catch variation (AACV). Bars represent the median score across the 100 realizations, and error bars represent the interquartile range (25th–75th percentiles). The number displayed in each panel represents the total score (sum of all medians for that EM) for the corresponding EM under that fishing scenario, with higher totals indicating better overall performance. The black dashed line separates the performance of each EM. EMs with a grey background indicate that NAA random effects were included, while EMs with a white background indicate that NAA random effects were not included. Three fishing scenarios are included: Adaptive ($\mathrm{F_A}$), Unsustainable ($\mathrm{F_U}$), and Contrasting ($\mathrm{F_C}$).}
+\label{fig:holistic_OM1}
+\end{figure}
+
+\vspace{1cm}
+
+**Major Comment 9**  
+> The word “interestingly” appears too many times in the Results section. State what is interesting about the results, and use other words to portray your findings. Or were the results surprising and unexpected? What were the expectations of the authors about the results, and how were those found to be different from the simulation results obtained?  
+
+**Response**  
+\textcolor{blue}{The word "interestingly" has been removed from the manuscript.}
+
+\vspace{1cm}
+
+**Major Comment 10**  
+> Lines 566 to 567: “slightly different” is too vague. I don’t understand that first sentence, “slightly different” from what?  
+**Response**  
+\textcolor{blue}{Revised to: "Finally, fish biology (stock–recruitment relationship) and fleet characteristics (e.g., fishing selectivity) were assumed to differ slightly between populations/regions in the present study (see Table 1)."}
+
+\vspace{1cm}
+
+**Major Comment 11**  
+> Line 578, the proposed methods would be an “intermediate” estimation approach when movement dynamics are not accounted for. What are the other approaches to consider? Does “intermediate” mean something between a survey index and a fully spatial state-space model. What is done before and after this intermediate step?  
+
+**Response**  
+\textcolor{blue}{We revised the conclusion to explicitly clarify what we mean by "intermediate." The new text (lines 608–618) reads: "While claims have been made that NAA random effects can account for other processes including movement, our study found that assessment models with NAA random effects outperformed their counterparts without them. However, NAA random effects could not fully capture movement dynamics, particularly under high levels of movement. Thus, models with NAA random effects provide a bridge between conventional panmictic stock assessments with no explicit movement processes and fully spatial state–space models that incorporate empirical tagging data to estimate movement rates. In cases where explicitly modeling movement dynamics is not feasible, NAA random effects offer a practical intermediate approach. The results of this study add to the growing body of literature suggesting that incorporating NAA random effects should be the default starting point in state–space stock assessments, as their inclusion leads to more accurate stock assessment and management-relevant estimates."}
+
+\vspace{1cm}
+
+**Minor Comment 2**  
+> There are many instances of missing capital letters in the article titles in the References. In BibTeX the capital letters would require curly braces around them, otherwise they will be rendered as lowercase. For example, Berger et al. (2012) should be “Accounting for spatial population structure at scales relevant to life history improves stock assessment: The case for Lake Erie walleye Sander vitreus”.  
+
+**Response**  
+\textcolor{blue}{The entire reference list has been thoroughly updated to ensure correct format of article titles.}
+
+\vspace{1cm}
+
+**Major Comment 12**  
+> If the recommendations of the paper are followed (NAA random effects should be a default starting point in state-space stock assessments), the inclusion of random effects on numbers-at-age transitions should be included as a default setting in WHAM, and provided as an alternative in setting up model runs.  
+
+**Response**  
+\textcolor{blue}{NAA random effects are available as a default option in WHAM and are typically evaluated in model diagnostics for most age-based stock assessments.}
+
+\vspace{1cm}
+
+**Major Comment 13**  
+> One question I had was about WHAM and its governance. Currently, both WHAM and its MSE tools exist in personal git repositories of authors (/lichengxue and /timjmiller). The work leading to the development of these tools was in part under the auspice of NOAA. As such, is there a plan to establish custodianship of these tools? This is especially important to consider since the tools are useful to many other scientific institutions outside of the United States. Will these tools outlive the careers of its primary developers, and what risk is involved for an agency to base its stock assessment work in these tools? WHAM and whamMSE are publicly available from the main developer’s personal repository on GitHub, and a clear NOAA Disclaimer appears there, but I still wanted to raise the question.  
+
+**Response**  
+\textcolor{blue}{Tim Miller is a NOAA federal scientist with a full-time responsibility for the long-term maintenance and development of WHAM. Chengxue Li leads the development of the MSE framework. In addition, the broader development team, as listed in this paper, includes researchers from multiple NOAA Science Centers who collectively supervise, maintain, and pioneer future research based on the WHAM and MSE platforms. Furthermore, there are ongoing NOAA-supported projects that provide resources to ensure the continued development and long-term sustainability of these tools.}
+
+\vspace{1cm}
+
+**Major Comment 14**  
+> How closely related are WHAM and whamMSE? They currently exist as two separate packages maintained by two developers. Is the integration of MSE tools for WHAM part of the development milestones, or was it strictly developed for the current article? This relates to my earlier question about governance and WHAM development. Will the whamMSE functionalities be developed in parallel with WHAM?  
+
+**Response**  
+\textcolor{blue}{WHAM and whamMSE are closely related packages developed by Tim Miller (NEFSC) and Chengxue Li (during his time at NEFSC). The whamMSE package is dependent on WHAM, meaning that any updates to WHAM are automatically integrated into whamMSE to ensure compatibility. When installing whamMSE in R, WHAM is installed as a required dependency. In turn, the use of whamMSE also provides feedback that helps guide improvements to WHAM.} 
+
+\textcolor{blue}{The whamMSE package provides a comprehensive platform for management strategy evaluation (MSE), including data collection and processing, assessment model development, biological reference point calculation, harvest control rules, catch projection, and catch apportionment. A methods paper describing these tools is currently under review, and extensive documentation and examples are available at \url{https://lichengxue.github.io/whamMSE/}.} 
+
+\textcolor{blue}{In parallel, WHAM itself is being extended to better handle movement dynamics. A spatial extension of WHAM is available on GitHub (\url{https://github.com/lichengxue/wham}) as a fork/branch of the current WHAM code base, ensuring that these developments remain fully integrated within the WHAM framework. Thus, WHAM and whamMSE are being developed in tandem, with the long-term goal of maintaining close alignment and integration between the two.}
+
+\vspace{1cm}
+
+**Major Comment 15**  
+> A more thorough discussion is warranted to explore trade-offs between implementing models of various levels of complexity, and the difficulty to do so by practitioners. If the tools presented can only be developed and implemented by a handful of practitioners, their endorsement and use in the fisheries science community might be limited.  
+
+**Response**  
+\begin{bluepar}
+We agree with the reviewer that accessibility and usability are critical for the adoption of any modeling framework. The whamMSE platform has already been applied across a range of regional and global research contexts, from NOAA Fisheries to academic institutions, demonstrating its flexibility and broader utility. Development has been conducted collaboratively, and user feedback from these applications has been actively incorporated to improve both functionality and usability.
+
+In particular, whamMSE has been designed as a community-oriented platform that allows users to adapt the framework to their specific research questions, while also contributing to further improvements. This collaborative, open-source development model helps ensure that the platform continues to evolve, becomes easier for practitioners to use, and maintains the scientific rigor needed to support fisheries management decisions across diverse stocks and regions.
+
+While we agree that a more detailed exploration of trade-offs in model complexity versus practitioner usability would be valuable, we feel that such an in-depth treatment is beyond the scope of the present study and is better addressed in future work.
+\end{bluepar}
+
+\vspace{1cm}
+
+---
+
+\newpage
+
+## Reviewer 2 Comments
+
+**Major Comment 1**  
+> The authors need an equation for the basic cohort decay equation to explain more clearly what the NAA REs are.  
+
+**Response**  
+\textcolor{blue}{Thank you for this helpful comment. We added a section in the Methods to explicitly describe NAA random effects (lines 160–170):}
+
+\textcolor{blue}{For simplicity, we present the one-stock, one-region version of the NAA transition equations. When the number of stocks ($n_s > 1$) or regions ($n_r > 1$) increases, the formulation extends to higher dimensions by incorporating stock- and region-specific random effects. The numbers-at-age transitions are:}
+
+\begin{equation}
+\log(N_{a,y}) =
+\begin{cases}
+\log(f(\text{SSB}_{y-1})) + \epsilon_{1,y}, & a = 1 \\[-0.3em]
+& \epsilon_{1,y} \sim N(0,\sigma_{Rec}^2) \\
+\log(N_{a-1,y-1} e^{-Z_{a-1,y-1}}) + \epsilon_{a,y}, & 1 < a < A \\[-0.3em]
+& \epsilon_{a,y} \sim N(0,\sigma_{NAA}^2) \\
+\log(N_{A-1,y-1} e^{-Z_{A-1,y-1}} + N_{A,y-1} e^{-Z_{A,y-1}}) + \epsilon_{A,y}, & a = A \\[-0.3em]
+& \epsilon_{A,y} \sim N(0,\sigma_{NAA}^2)
+\end{cases}
+\end{equation}
+
+\textcolor{blue}{where $N_{a,y}$ is the abundance at age $a$ in year $y$, $Z_{a,y} = F_{a,y} + M_{a,y}$ is total mortality, $f(\cdot)$ is the stock–recruitment function, $A$ defines the plus-group, and $\epsilon$ are lognormal process errors. In this study, recruitment and NAA transitions in the OM were treated as independent and identically distributed (IID) random effects, with $\sigma_{Rec} = 0.5$ for recruitment and $\sigma_{NAA} = 0.2$ for age transitions across stocks and regions. It should be noted that when NAA random effects are included in the model, only a single additional variance parameter ($\sigma_{NAA}$) is estimated, representing variability in the NAA transitions.}
+
+\vspace{1cm}
+
+**Major Comment 2**  
+> Describe how the NA REs were modelled. IID or 2DAR1? I suspect that IID Res have limited ability to capture model mis-specification because these process errors tend to deviate from zero less than 2DAR1 errors. I suggest how to model NAA REs should be a discussion topic.  
+
+**Response**  
+\textcolor{blue}{Thank you for this comment, we've added some text about this in our revise manusctript see lines 575-583: 
+"While ontogenetic movement may be biologically plausible in certain cases, it remains unclear whether a more complex structure for NAA random effects (e.g., age-specific movement) could effectively capture differences in age-based movement dynamics. In this study, we modeled NAA random effects as IID deviations, which may have limited ability to account for model mis-specification. More flexible N NAA configurations, such as AR(1) processes across years or ages, or two-dimensional AR(1) (2D-AR1) structures across both years and ages, may enhance the ability of NAA random effects to capture more complex dynamics. Further investigation is needed to assess the broader applicability of NAA random effects under such scenarios."}
+
+\vspace{1cm}
+
+**Major Comment 3**  
+> L74 and L487-488. This depends on what the authors mean by true fishing selectivity, which needs to be clarified in the paper. If there is spatial heterogeneity in the age distribution of the stock and area-specific fleets, then the selectivity of the fleets for the entire stock will differ, although selectivity for the area sub-stocks may be the same. If the trends in stock numbers at age over time are the same in the areas then this approach is OK I think. [my rant] However, if there is something like source-sink dynamics or environmental shifts in distribution then the trends in the areas will not be the same. I suspect that spatial dynamics are a major reason for "conflicts" in stock assessment inputs. The conflict is actually in the “too simple” space-aggregated model and not the inputs.  
+
+**Response**  
+\textcolor{blue}{We have clarified what we mean by "true fishing selectivity" (lines 71–83): 
+"The fleets-as-areas approach is often used as a practical starting point in spatial assessments (Berger et al., 2012; Waterhouse et al., 2014; Lee et al., 2017; Bosley et al., 2022). This approach assumes the population is uniformly distributed across its range; any apparent spatial heterogeneity is represented indirectly by defining area-specific fleets, with differences in age compositions attributed to fishing selectivity rather than explicit spatial structure. However, differences in estimated selectivity across areas may not reflect actual differences in the underlying gear- or fleet-specific selectivity patterns. Instead, such differences may arise from spatial heterogeneity in the population itself (e.g., age structure differences caused by movement, source–sink dynamics, or environmentally driven shifts in distribution) (Cope et al., 2011; Berger et al., 2012; Hurtado-Ferro et al., 2014; O’Boyle et al., 2016). When such dynamics are present, the implicit mismatch between the assumption (spatially varying selectivity) and the underlying process (spatially varying distribution) can undermine the performance of the assessment–management framework (Punt et al., 2016a,b)."}
+
+\vspace{1cm}
+
+**Major Comment 4**  
+> L109. Closed-loop simulations need to be explained a little more, perhaps later in the paper, for those not familiar with MSE (like many graduate students). This will make the paper more accessible to a broader readership.  
+
+**Response**  
+\textcolor{blue}{We added text to clarify MSE closed-loop simulations in Section 2.4 Management Strategy Evaluation (lines 223–228): 
+"A management strategy evaluation (MSE) was conducted to evaluate the performance of the EMs. MSEs are typically implemented as closed-loop simulations, where population dynamics, data collection, stock assessment, and management actions are linked together. Management decisions feed back into the system and affect future population trajectories, allowing the long-term consequences of alternative strategies to be evaluated in a realistic, iterative framework."}
+
+\vspace{1cm}
+
+**Major Comment 5**  
+> L182. CV=0.1 for survey seems like a low value. For example, the confidence intervals in Figures 2 and 4 of [NEFSC 2023 report] suggest a higher CV. The paper will be more relevant if CV=0.3 + OM_high is also investigated. Present results similar to how the low movement scenario was handled.  
+
+**Response**  
+\textcolor{blue}{Thank you for this helpful comment. We conducted a sensitivity analysis by increasing the survey CV to 0.3 and found that the results remained broadly similar. This is likely because the CV for aggregate catch was already relatively low (0.1), so increasing the CV for survey data had little influence on parameter estimates, as the model placed more weight on the catch data. Importantly, since our study focuses on comparing estimation models with and without NAA random effects, changing the survey CV does not affect the main conclusion regarding whether including NAA random effects helps to alleviate issues related to ignoring movement dynamics, as long as data quality is applied consistently across all scenarios. We also note that conditioning the operating model to exactly match the Black Sea Bass assessment was not the primary goal of this study, and our conclusions should not be interpreted as directly prescriptive for that stock. Finally, due to limited computational resources, conducting additional full spatial MSE scenarios with higher survey CVs would require several months of run time.}
+
+\vspace{1cm}
+
+**Major Comment 6**  
+> L194. A possible difference in SpD and SEP models is that SpD could have shared parameters across regions. Is this possible in WHAM, and if so was this used in the SpD Ems?  
+
+**Response**  
+\textcolor{blue}{Thank you for pointing this out. We had not emphasized this additional feature of the SpD models, and we have now clarified it in the text (lines 208-212): "The difference between SEP and SpD EMs is that SpD EMs use global SPR-based reference points weighted by regional recruitment, while SEP EMs separately calculate regional SPR-based reference points. In addition, SpD EMs allow certain parameters (e.g., NAA random effects, movement) to be shared across regions, whereas SEP EMs require separate parameter sets for each region."}
+
+\vspace{1cm}
+
+**Major Comment 7**  
+> Equation 1. Explain what the truth is and how is it calculated. For example, in the feedback period, are the stock F's based on catch advice (no error) etc. Does the truth vary in each iteration of an OM, etc.  
+
+**Response**  
+\textcolor{blue}{We have added clarification to the text (lines 292–298): 
+"Here, catch refers to the catch advice projected by each EM. This projected catch is treated as the realized catch in the OM, with no observation error added (i.e., projected catch from the EM = actual catch in the OM). When updating $F$ in the OM, the true catch is used without observation error, and the resulting $SSB$ represents the true $SSB$ from the OM given that $F$. Although observed catch values with error are generated in the observation model and can be used for comparison, they are not used in the calculation of the performance metrics presented here."}
+
+
+\vspace{1cm}
+
+**Major Comment 8**  
+> Check the accuracy of figure labels, and figure and table captions. I found a few errors but I did not examine the low movement figures closely.  
+
+**Response**  
+\textcolor{blue}{We carefully reviewed all figure labels and table captions and corrected the errors noted by the 2 reviewers. We also added additional details to each caption to improve clarity and readability for the reader. Please see the revised manuscript for the updated versions.}
+
+\vspace{1cm}
+
+**Minor Comment 1**  
+> L39. I am sure how well NA REs account for these processes. That is the focus of this paper, wrt to movement. Maybe 'represent misspecification of' is better wording?  
+
+**Response**  
+\textcolor{blue}{We revised this setence "Random effects on numbers-at-age (NAA) transitions introduce flexibility into a state-space stock assessment that can partially represent misspecification of unmodeled processes, such as movement, natural mortality, selectivity, or misreported catch (Nielsen et al., 2014; Cadigan, 2016; Albertsen et al., 2018; Perretti et al., 2020; Stock et al., 2021a; Stock et al., 2021b)."}
+
+\vspace{1cm}
+
+**Minor Comment 2**  
+> L50. I don’t think Cadigan (2016) claimed this. He just cited Gudmundsson and Gunnlaugsson (2012) who suggested that NAA REs could represent migrations. Maybe I misunderstood the text, and if so, this text should be clarified.  
+
+**Response**  
+\textcolor{blue}{Fixed, Gudmundsson (2012) was cited instead.}
+
+\vspace{1cm}
+
+**Minor Comment 3**  
+> L59. Traditional assessments models don’t say anything about spatial distribution. They just model the stock as a whole. I think the same for demographic homogeneity. We know this exists but we just model population totals with average weights, maturities, etc. I suggest the authors refine this text to clarify their points.  
+
+**Response**  
+\textcolor{blue}{We revised the text for clarity (line 59): 
+"Acknowledging biocomplexity and spatial heterogeneity in fish distribution and demographics challenges the panmictic assumptions of traditional stock assessment models, which treat the stock as a single population that is uniformly distributed, demographically homogeneous, closed to migration, and reproductively isolated (Beverton, 1957, Cadrin et al., 2020). In practice, these models represent heterogeneous stocks by estimating population totals based on average weights, maturities, and mortality rates, thereby smoothing over underlying spatial and demographic variation."}
+
+\vspace{1cm}
+
+**Minor Comment 4**  
+> L71-72. Seems like a contradiction. Please clarify what you mean.  
+
+**Response**  
+\textcolor{blue}{See response for **Major Comment 7**}
+
+\vspace{1cm}
+
+**Minor Comment 5**  
+> L109. “in a controlled, research-based environment”. I don't see the value of this text? Isn't this always the case for MSE? Please clarify your point.  
+
+**Response**  
+\textcolor{blue}{We removed “in a controlled, research-based environment” from the main text.}
+
+\vspace{1cm}
+
+**Minor Comment 6**  
+> L172. clarify if the movement rates varied in each simulation iteration.  
+
+**Response**  
+\textcolor{blue}{We added clarification in lines 184–188: 
+"The movement rate outside the spawning season was assumed to be time-varying and modeled as a random effect, with a standard deviation of 0.5 and an AR(1) autocorrelation coefficient of 0.5. In each simulation replicate, a new realization of these movement rates was generated; examples are provided in Figures S11 and S16."}
+
+\vspace{1cm}
+
+**Minor Comment 7**  
+> Figure S1 and Figure S16: Describe panels and clarify in the caption that the same movement rates are used in the spring and winter (I think).  
+
+**Response**  
+\textcolor{blue}{Fixed.}
+
+\vspace{1cm}
+
+**Minor Comment 8**  
+> L217. Describe why only recruitment random effects were assumed to continue in projections?  
+
+**Response**  
+\textcolor{blue}{The choice of which random effects to project forward remains an active area of discussion, with different practices adopted in the literature. To avoid confounding effects arising from differences in process error specifications and spatial dynamics, we elected to carry forward only recruitment random effects into the projection period. This approach ensured consistency across EMs, as all models included recruitment random effects.}
+
+\vspace{1cm}
+
+**Minor Comment 9**  
+> L233. I assume the WHAM models were fit 11 times for each iteration of an OM: 1st after 30 year historical period, then ten times in 30-year feedback period? It will help clarify the MSC if the authors should describe this.  
+
+**Response**  
+\textcolor{blue}{We added clarification in lines 260–263: 
+"The annual catch advice from each EM was sequentially fed into the OMs to update $F$ and population dynamics, and this closed-loop process was repeated until the end of the feedback period. The EMs were first fit at the end of the 30-year historical period (year 30) and then refit every three years during the 30-year feedback period, resulting in 10 EM fits per OM iteration. The final EM fit occurred in year 57, and its catch advice was used to update the OM through the end of year 60."}
+
+\vspace{1cm}
+
+**Minor Comment 10**  
+> Fig. S2 and S3 use different acronyms for EMs. Should use the ones in Table 3.  
+
+**Response**  
+\textcolor{blue}{Fixed. Thank you.}
+
+\vspace{1cm}
+
+**Minor Comment 11**  
+> L304. I think this should be Fig. S2.  
+
+**Response**  
+\textcolor{blue}{Fixed.}
+
+\vspace{1cm}
+
+**Minor Comment 12**  
+> L305-307. Describe the basis for this conclusion.  
+
+**Response**  
+\textcolor{blue}{We added clarification in lines 343–348: 
+"The mean recruitment parameter ($\mu_{Rec}$), recruitment standard deviation ($\sigma_{Rec}$), and NAA standard deviation ($\sigma_{NAA}$) from EMs without movement appeared to adjust in order to compensate for the absence of movement dynamics (Figure S4). This suggests that variability arising from movement was absorbed by recruitment and NAA random effects, effectively substituting for the missing movement processes."}
+
+\vspace{1cm}
+
+**Minor Comment 13**  
+> Fig. S5. IQR is commonly defined as the difference between the 75th and 25th percentiles, and not the 40th and 60th percentiles like in this figure. Revise this.  
+
+**Response**  
+\textcolor{blue}{Thank you for noting this. We intentionally used the 40th–60th percentile range rather than the traditional interquartile range (25th–75th) because the latter was too wide and caused extensive overlap among EMs, making the figure difficult to interpret. Our goal was to provide a clearer visual comparison across EMs, while still illustrating the central tendency of the results.}
+
+\vspace{1cm}
+
+**Minor Comment 14**  
+> Fig. 6 and S11 have the same caption?  
+
+**Response**  
+\textcolor{blue}{Fixed.}
+
+\vspace{1cm}
+
+**Minor Comment 15**  
+> L360. Not lower than the SpE Ems, correct? Clarify this.  
+
+**Response**  
+\textcolor{blue}{Fixed.}
+
+\vspace{1cm}
+
+**Minor Comment 16**  
+> Fig.7. Caption should clarify that the number in each panel is the total score.  
+
+**Response**  
+\textcolor{blue}{Fixed.}
+
+\vspace{1cm}
+
+**Minor Comment 17**  
+> Figures S14-S15. fix OM_low in caption.  
+
+**Response**  
+\textcolor{blue}{Fixed.}
+
+\vspace{1cm}
+
+**Minor Comment 18**  
+> L568. Mention that differences in maturation and growth rates are key biological characteristics.  
+
+**Response**  
+\textcolor{blue}{We now mentioned "growth rates" as one of key biological characteristics.}
+
+\vspace{1cm}
+
+---

@@ -1,0 +1,29 @@
+---
+title: "*Cover Letter*"
+author: "Li et al."
+output:
+  pdf_document:
+    latex_engine: xelatex
+fontsize: 11pt
+geometry: margin=1in
+---
+
+Dear Associate Editor,  
+
+We are pleased to submit our revised manuscript entitled  
+**"Random effects on numbers-at-age transitions implicitly account for movement dynamics and improve stock assessment and management"** (CJFAS-2025-0092).  
+
+We are grateful to you and the reviewers for the constructive feedback. We have carefully considered all comments and substantially revised the manuscript. The major revisions include:  
+
+- **Clarification of methods and equations**  
+- **Sensitivity analyses and robustness checks**  
+- **Model structure clarifications**  
+- **Revised figures and captions**  
+- **Improved conclusions and implications**  
+
+Minor edits were also made throughout the manuscript to correct wording, grammar, figure references, and reference formatting.  
+
+We believe these revisions have substantially strengthened the manuscript and improved its accessibility to a broader readership. We thank you again for your time and consideration, and we look forward to your assessment of our revised submission.  
+
+Sincerely,  
+Li et al.  
