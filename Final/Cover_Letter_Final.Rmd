@@ -1,0 +1,24 @@
+---
+title: "Cover Letter"
+output:
+  pdf_document:
+    latex_engine: xelatex
+fontsize: 11pt
+geometry: margin=1in
+---
+
+Dear Editor,  
+
+We sincerely thank you, the Associate Editor, and the reviewers for the time and effort devoted to evaluating our manuscript *“Random effects on numbers-at-age transitions implicitly account for movement dynamics and improve stock assessment and management” (CJFAS-2025-0092)*. We are very pleased that the manuscript has been accepted for publication after minor revision.  
+
+We confirm that all requested revisions have been incorporated in the final version of the manuscript. In addition, the data and code underlying this study are publicly available at:  
+- GitHub: [https://github.com/lichengxue/Bias_Correction_Project](https://github.com/lichengxue/Bias_Correction_Project)  
+
+We greatly appreciate your guidance, the Associate Editor’s handling of the review process, and the constructive feedback from the reviewers, which have significantly improved the clarity and quality of this work.  
+
+Thank you again for your support throughout the review process.  
+
+Sincerely,  
+
+Chengxue Li (Corresponding Author)  
+on behalf of all co-authors  
