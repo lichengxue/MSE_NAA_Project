@@ -381,9 +381,9 @@ ability to link environmental covariates to specific processes
 \citep{Stock2021a}. More recently, WHAM has been extended to incorporate
 spatial dynamics, allowing populations to be modeled with spatial
 heterogeneity in biology, movement, and fleet dynamics
-\citep{Miller2025review}. Here we give a minimal overview necessary for
-the present study (see Methods in the supplementary file for details).
-We used the SPASAM-MSE package
+\citep{Miller2025}. Here we give a minimal overview necessary for the
+present study (see Methods in the supplementary file for details). We
+used the SPASAM-MSE package
 (\url{https://lichengxue.github.io/whamMSE/}), a comprehensive MSE
 toolbox developed upon WHAM \citep{Liinreview2}, to conduct MSE and
 explore potential implications of management strategies.
@@ -435,7 +435,7 @@ For simplicity, we present the one-population, one-region version of the
 NAA transition equations. When the number of populations (\(n_s > 1\))
 or regions (\(n_r > 1\)) increases, the formulation extends to higher
 dimensions by incorporating population- and region-specific random
-effects \citep{Miller2025review}. The numbers-at-age transitions are:
+effects \citep{Miller2025}. The numbers-at-age transitions are:
 
 \begin{equation}
 \log(N_{a,y}) =
@@ -478,12 +478,12 @@ source-sink dynamics, that could reflect habitat suitability
 to region 2 and back from region 2 to region 1, whereas population 2
 cannot move between regions. This type of movement represents strict
 source-sink movement dynamics typical of some species (e.g., black sea
-bass, \emph{Centropristis striata}, Miller et al., In Press). The
-movement rate outside the spawning season was assumed to be time-varying
-and treated as a random effect, with a standard deviation of 0.5 and an
-AR1 autocorrelation coefficient of 0.5. In each simulation replicate, a
-new realization of these movement rates was generated; examples are
-shown in Figs. S1 and S16.
+bass, \emph{Centropristis striata}, Miller et al., 2025). The movement
+rate outside the spawning season was assumed to be time-varying and
+treated as a random effect, with a standard deviation of 0.5 and an AR1
+autocorrelation coefficient of 0.5. In each simulation replicate, a new
+realization of these movement rates was generated; examples are shown in
+Figs. S1 and S16.
 
 \hypertarget{fleet-and-survey}{%
 \subsubsection{Fleet and Survey}\label{fleet-and-survey}}
@@ -711,9 +711,9 @@ Following performance metrics were also collected:
 
 The annual global reference points (\(F_{MSY_{y}}\) and
 \(SSB_{MSY_{y}}\)) were used for calculating some of the above
-performance metrics \citep{Miller2025review}, with global values
-obtained as a weighted sum, where weights were based on the mean of
-realized annual recruitments for each population within each replicate.
+performance metrics \citep{Miller2025}, with global values obtained as a
+weighted sum, where weights were based on the mean of realized annual
+recruitments for each population within each replicate.
 
 All performance metrics for the 10 EMs at the global scale were
 collected to provide a holistic view of model performance. Metrics such
@@ -1324,8 +1324,11 @@ Fisheries Science Center (25\%).
 statement}\label{data-availability-statement}}
 
 No empirical data were collected for this study. Data used for this
-study were produced through simulation. Code for all simulations is
-available at \url{https://github.com/lichengxue/MSE_NAA_Project}.
+study were produced through simulation. The code underlying this article
+are available on \url{https://github.com/lichengxue/MSE_NAA_Project},
+and have been archived at
+\href{https://doi.org/10.5281/zenodo.17281382}{DOI:
+10.5281/zenodo.17281382}.
 
 \hypertarget{tables}{%
 \section{Tables}\label{tables}}

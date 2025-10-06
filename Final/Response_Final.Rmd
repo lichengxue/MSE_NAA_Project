@@ -1,0 +1,63 @@
+---
+title: "Response to Reviewer Comments: CJFAS-2025-0092 — Random effects on numbers-at-age transitions implicitly account for movement dynamics and improve stock assessment and management"
+author: "Authors: Li et al."
+output:
+  pdf_document:
+    toc: false
+    number_sections: false
+    latex_engine: xelatex
+fontsize: 11pt
+geometry: margin=1in
+header-includes:
+  - \usepackage{float}
+  - \usepackage{xcolor}
+  - \newenvironment{bluepar}{\par\color{blue}}{\par}
+---
+
+# *Response to Reviewer Comments (Round 2)* {-}
+
+Dear Associate Editor and Reviewer,  
+
+We thank the reviewer for the thoughtful follow-up comments and suggestions.  
+All requested revisions have been incorporated into the manuscript and supplementary materials.  
+Below we provide point-by-point responses describing how each suggestion has been addressed.
+
+---
+
+## Reviewer 1 Comments and Author Responses
+
+**Major Comment**  
+> I was mostly satisfied with the author’s responses to my comments on the first version of this paper. However, I would like to see text added to the paper for my Major Comment #5. This could be as simple as adding “We conducted a sensitivity analysis by increasing the survey CV to 0.3” near L196. Then, give a small section in the results section with text like “We found that the results remained broadly similar. This is likely because the CV for aggregate catch was already relatively low (0.1), so increasing the CV for survey data had little influence on parameter estimates, as the model placed more weight on the catch data. Importantly, since our study focuses on comparing estimation models with and without NAA random effects, changing the survey CV does not affect the main conclusion regarding whether including NAA random effects helps to alleviate issues related to ignoring movement dynamics, as long as data quality is applied consistently across all scenarios.”  
+
+**Response:**  
+We thank the reviewer for this helpful recommendation. We have now added the suggested text at **L196** describing the sensitivity analysis (“We conducted a sensitivity analysis by increasing the survey CV to 0.3”). In addition, a short section was added in the **Results** to report that the outcomes remained broadly similar, as increasing the survey CV had little influence on parameter estimates because the model assigned greater weight to the catch data. We also clarified that this sensitivity test did not alter the primary conclusion that including NAA random effects helps mitigate bias from unmodeled movement dynamics, provided data quality is consistent across all scenarios.
+
+---
+
+**Minor Comment #8 and Figure S5**  
+> Similarly, I would like to see the response to my Minor Comment #8 reflected in the paper. Also, for Figure S5, the authors should call the range something different than interquartile. I suggest calling it IPR40, the interpercentile range of the .4 – (1-.4 = 0.6) quantiles.  
+
+**Response:**  
+We have added response to the Minor Comment #8 in the main text. Figure S5 and its caption now refer to the range as **IPR40 (interpercentile range between the 0.4 and 0.6 quantiles)**, and the text has been updated accordingly.
+
+---
+
+**Suggested Edits for Revised Text**  
+> - L175. Change to “Two different movement scenarios (Low and High)”.  
+> - L216. Refer to Equation 1 epsilons when describing the NAA random effects.  
+> - L329. Change to “To simplify the results we focused on a subset …”.  
+> - L385. “exhibited potential to lower” → “frequently lowered”, if that is the message.  
+> - L398. Remove “found to be”.  
+
+**Response:**  
+We appreciate these detailed editorial suggestions and have implemented all of them in the revised manuscript:  
+- **L175:** Updated to “Two different movement scenarios (Low and High).”  
+- **L216:** Added explicit reference to the ε terms in Equation 1 when describing NAA random effects.  
+- **L329:** Simplified the phrasing as suggested.  
+- **L385:** Replaced “exhibited potential to lower” with “frequently lowered.”  
+- **L398:** Removed “found to be” for clarity.  
+
+---
+
+**Overall Response**  
+We sincerely thank the reviewer for their constructive and supportive feedback. All recommended textual edits and figure updates have been incorporated, and the revised manuscript now reflects these clarifications. We believe these refinements further improve readability and transparency.

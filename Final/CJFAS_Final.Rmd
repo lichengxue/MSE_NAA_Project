@@ -122,7 +122,7 @@ In this study, we use a MSE with closed-loop simulations to evaluate the perform
 
 ## Model Overview 
 
-The Woods Hole Assessment Model (WHAM, https://timjmiller.github.io/wham), a state-space assessment model, was used as the basis of the operating model (OM) and estimation model (or assessment model; EM) in the MSE framework. WHAM can incorporate time- and/or age-varying process errors on population and fishery processes, including recruitment, NAA, natural mortality, movement, fishing selectivity, and survey catchability, and it has ability to link environmental covariates to specific processes \citep{Stock2021a}. More recently, WHAM has been extended to incorporate spatial dynamics, allowing populations to be modeled with spatial heterogeneity in biology, movement, and fleet dynamics \citep{Miller2025review}. Here we give a minimal overview necessary for the present study (see Methods in the supplementary file for details). We used the SPASAM-MSE package (https://lichengxue.github.io/whamMSE/), a comprehensive MSE toolbox developed upon WHAM \citep{Liinreview2}, to conduct MSE and explore potential implications of management strategies. 
+The Woods Hole Assessment Model (WHAM, https://timjmiller.github.io/wham), a state-space assessment model, was used as the basis of the operating model (OM) and estimation model (or assessment model; EM) in the MSE framework. WHAM can incorporate time- and/or age-varying process errors on population and fishery processes, including recruitment, NAA, natural mortality, movement, fishing selectivity, and survey catchability, and it has ability to link environmental covariates to specific processes \citep{Stock2021a}. More recently, WHAM has been extended to incorporate spatial dynamics, allowing populations to be modeled with spatial heterogeneity in biology, movement, and fleet dynamics \citep{Miller2025}. Here we give a minimal overview necessary for the present study (see Methods in the supplementary file for details). We used the SPASAM-MSE package (https://lichengxue.github.io/whamMSE/), a comprehensive MSE toolbox developed upon WHAM \citep{Liinreview2}, to conduct MSE and explore potential implications of management strategies. 
 
 ## Operating Models (OMs)
 
@@ -138,7 +138,7 @@ The Beverton-Holt stock-recruitment relationship was assumed for both population
 
 ### Numbers-at-age (NAA) Transitions
 
-For simplicity, we present the one-population, one-region version of the NAA transition equations. When the number of populations (\(n_s > 1\)) or regions (\(n_r > 1\)) increases, the formulation extends to higher dimensions by incorporating population- and region-specific random effects \citep{Miller2025review}. The numbers-at-age transitions are:
+For simplicity, we present the one-population, one-region version of the NAA transition equations. When the number of populations (\(n_s > 1\)) or regions (\(n_r > 1\)) increases, the formulation extends to higher dimensions by incorporating population- and region-specific random effects \citep{Miller2025}. The numbers-at-age transitions are:
 
 \begin{equation}
 \log(N_{a,y}) =
@@ -156,7 +156,7 @@ where \(N_{a,y}\) is the abundance at age \(a\) in year \(y\), \(Z_{a,y} = F_{a,
 
 ### Movement Dynamics
 
-Four seasons (spring, summer, autumn, and winter) were included in the OMs to represent seasonal migrations characteristic of natal homing dynamics. Specifically, the two reproductively isolated populations were assumed to return to their natal regions at the end of summer, spawn in autumn, and migrate to other regions during spring and winter (e.g., for feeding migrations). Two different movement scenarios (low and high) were included in this study (see \autoref{fig:movement_dynamics}). The high movement scenario ($\text{OM}_{\text{high}}$) allows both populations to move between regions outside the spawning season. The movement rate from region 1 to region 2 was assumed to be much higher than the rate in the opposite direction, reflecting a degree of source-sink dynamics, that could reflect habitat suitability \citep{Keymer2000}. The low movement scenario ($\text{OM}_{\text{low}}$) allows population 1 to move from region 1 to region 2 and back from region 2 to region 1, whereas population 2 cannot move between regions. This type of movement represents strict source-sink movement dynamics typical of some species (e.g., black sea bass, *Centropristis striata*, Miller et al., In  Press). The movement rate outside the spawning season was assumed to be time-varying and treated as a random effect, with a standard deviation of 0.5 and an AR1 autocorrelation coefficient of 0.5. In each simulation replicate, a new realization of these movement rates was generated; examples are shown in Figs. S1 and S16.
+Four seasons (spring, summer, autumn, and winter) were included in the OMs to represent seasonal migrations characteristic of natal homing dynamics. Specifically, the two reproductively isolated populations were assumed to return to their natal regions at the end of summer, spawn in autumn, and migrate to other regions during spring and winter (e.g., for feeding migrations). Two different movement scenarios (low and high) were included in this study (see \autoref{fig:movement_dynamics}). The high movement scenario ($\text{OM}_{\text{high}}$) allows both populations to move between regions outside the spawning season. The movement rate from region 1 to region 2 was assumed to be much higher than the rate in the opposite direction, reflecting a degree of source-sink dynamics, that could reflect habitat suitability \citep{Keymer2000}. The low movement scenario ($\text{OM}_{\text{low}}$) allows population 1 to move from region 1 to region 2 and back from region 2 to region 1, whereas population 2 cannot move between regions. This type of movement represents strict source-sink movement dynamics typical of some species (e.g., black sea bass, *Centropristis striata*, Miller et al., 2025). The movement rate outside the spawning season was assumed to be time-varying and treated as a random effect, with a standard deviation of 0.5 and an AR1 autocorrelation coefficient of 0.5. In each simulation replicate, a new realization of these movement rates was generated; examples are shown in Figs. S1 and S16.
 
 ### Fleet and Survey
 
@@ -232,7 +232,7 @@ Following performance metrics were also collected:
 
 - Average annual catch variation: $\text{AACV} = \frac{\sum_{y=1}^{n} \left|\text{Catch}_{y} - \text{Catch}_{y-1}\right|}{\sum_{y=1}^{n} \text{Catch}_{y-1}}$. 
 
-The annual global reference points ($F_{MSY_{y}}$ and $SSB_{MSY_{y}}$) were used for calculating some of the above performance metrics \citep{Miller2025review}, with global values obtained as a weighted sum, where weights were based on the mean of realized annual recruitments for each population within each replicate.
+The annual global reference points ($F_{MSY_{y}}$ and $SSB_{MSY_{y}}$) were used for calculating some of the above performance metrics \citep{Miller2025}, with global values obtained as a weighted sum, where weights were based on the mean of realized annual recruitments for each population within each replicate.
 
 All performance metrics for the 10 EMs at the global scale were collected to provide a holistic view of model performance. Metrics such as catch, $F$, $SSB$, terminal-year $SSB/SSB_{MSY}$ for each OM and fishing history were normalized to scores between 0 and 1 using:
 
@@ -370,7 +370,10 @@ This work was funded by NOAA Fisheries Northeast Fisheries Science Center (50%),
 
 # Data availability statement 
 
-No empirical data were collected for this study. Data used for this study were produced through simulation. Code for all simulations is available at https://github.com/lichengxue/MSE_NAA_Project.
+No empirical data were collected for this study. Data used for this study were produced through simulation. The  code underlying this article are available on 
+[https://github.com/lichengxue/MSE_NAA_Project](https://github.com/lichengxue/MSE_NAA_Project), 
+and have been archived at 
+[DOI: 10.5281/zenodo.17281382](https://doi.org/10.5281/zenodo.17281382).
 
 # Tables
 
