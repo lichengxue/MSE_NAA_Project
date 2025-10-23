@@ -1,0 +1,28 @@
+\begin{landscape}
+\begin{longtable}{p{3cm} p{6cm} p{2cm} p{3.5cm} p{5.5cm}}  
+  \caption{Descriptions of 10 estimation models} \label{EM_tabel} \\
+  \toprule
+  \textbf{Model} & \textbf{Type} & \textbf{Move} & \textbf{Random effects} & \textbf{Description} \\
+  \midrule
+  \endfirsthead
+  \caption[]{(continued)} \\
+  \toprule
+  \textbf{Model} & \textbf{Type} & \textbf{Move} & \textbf{Random effects} & \textbf{Description} \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endfoot
+
+  PAN$_{\text{NAA}}$ & Panmictic (catch aggregated) & No & NAA, Rec & Catch data aggregated across regions \\
+  PAN$_{\text{noNAA}}$ & Panmictic (catch aggregated) & No & \textbf{Rec only} & Catch data aggregated across regions \\
+  FAA$_{\text{NAA}}$ & Spatially implicit (fleets-as-areas) & No & NAA, Rec & Multiple fleets account for spatial difference in fleet structure \\
+  FAA$_{\text{noNAA}}$ & Spatially implicit (fleets-as-areas) & No & \textbf{Rec only} & Multiple fleets account for spatial difference in fleet structure \\
+  SEP$_{\text{NAA}}$ & Separate & No & NAA, Rec & Separate single stock assessment model \\
+  SEP$_{\text{noNAA}}$ & Separate & No & \textbf{Rec only} & Separate single stock assessment model \\
+  SpD$_{\text{NAA}}$ & Spatially disaggregated & No & NAA, Rec & Spatially disaggregated without movement \\
+  SpD$_{\text{noNAA}}$ & Spatially disaggregated & No & \textbf{Rec only} & Spatially disaggregated without movement \\
+  SpE$_{\text{NAA,Est}}$ & Spatially explicit & Yes (Est) & NAA, Rec, Move & Spatially explicit with movement estimated using a prior \\
+  SpE$_{\text{NAA,Fix}}$ & Spatially explicit & Yes (Fix) & NAA, Rec & Spatially explicit with movement fixed as known \\
+  
+\end{longtable}
+\end{landscape}
