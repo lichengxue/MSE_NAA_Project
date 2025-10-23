@@ -1,0 +1,102 @@
+# Simple: copy listed figures into "Figures&Tables"
+dest <- "Figures&Tables"
+if (!dir.exists(dest)) dir.create(dest, recursive = TRUE)
+
+figs <- c(
+  "Movement_dynamics.PNG",
+  "Combined_Figures.PNG",
+  "Performance_first_5_years_relative_OM_1.PNG",
+  "Performance_last_5_years_relative_OM_1.PNG",
+  "Catch_variation_OM1.PNG",
+  "Probability_Overfished_Overfishing_OM1_MSY.PNG",
+  "Holistic_OM_1.PNG"
+)
+
+# Copy any that exist; warn on missing
+exists_vec <- file.exists(figs)
+if (any(exists_vec)) {
+  copied <- file.copy(figs[exists_vec], dest, overwrite = TRUE)
+  message("Copied: ", paste(basename(figs[exists_vec][copied]), collapse = ", "))
+}
+if (any(!exists_vec)) {
+  message("Not found: ", paste(figs[!exists_vec], collapse = ", "))
+}
+
+# Simple: copy all listed figures + tables into "Figures&Tables"
+dest <- "Figures&Tables"
+if (!dir.exists(dest)) dir.create(dest, recursive = TRUE)
+
+figs <- c(
+  # From main paper
+  "Movement_dynamics.PNG",
+  "Combined_Figures.PNG",
+  "Performance_first_5_years_relative_OM_1.PNG",
+  "Performance_last_5_years_relative_OM_1.PNG",
+  "Catch_variation_OM1.PNG",
+  "Probability_Overfished_Overfishing_OM1_MSY.PNG",
+  "Holistic_OM_1.PNG",
+  # From supplement section you pasted
+  "Movement1.PNG",
+  "Bias_Rec_OM_1.PNG",
+  "Bias_SSB_OM_1.PNG",
+  "Parameter_Estimates_OM_1.PNG",
+  "Catch_G_OM1.PNG",
+  "Catch_1_OM1.PNG",
+  "Catch_2_OM1.PNG",
+  "SSB_G_OM1.PNG",
+  "SSB_1_OM1.PNG",
+  "SSB_2_OM1.PNG",
+  "Probability_Overfished_Overfishing_OM1_SPR.PNG",
+  "Population_Status_OM_1_MSY.PNG",
+  "Population_Status_OM_1_SPR.PNG",
+  "Holistic_OM_R1_1.PNG",
+  "Holistic_OM_R2_1.PNG",
+  "Movement2.PNG",
+  "Bias_Rec_OM_2.PNG",
+  "Bias_SSB_OM_2.PNG",
+  "Parameter_Estimates_OM_2.PNG",
+  "Catch_G_OM2.PNG",
+  "Catch_1_OM2.PNG",
+  "Catch_2_OM2.PNG",
+  "SSB_G_OM2.PNG",
+  "SSB_1_OM2.PNG",
+  "SSB_2_OM2.PNG",
+  "Performance_first_5_years_relative_OM_2.PNG",
+  "Performance_last_5_years_relative_OM_2.PNG",
+  "Catch_variation_OM2.PNG",
+  "Probability_Overfished_Overfishing_OM2_MSY.PNG",
+  "Probability_Overfished_Overfishing_OM2_SPR.PNG",
+  "Population_Status_OM_2_MSY.PNG",
+  "Population_Status_OM_2_SPR.PNG",
+  "Holistic_OM_2.PNG",
+  "Holistic_OM_R1_2.PNG",
+  "Holistic_OM_R2_2.PNG"
+)
+
+tables <- c(
+  # From main paper + supplement
+  "para_tab.tex",
+  "F_scenario_table.tex",
+  "EM_table.tex",
+  "HCR_table.tex"
+)
+
+# Copy any that exist; warn on missing (figures)
+fig_exists <- file.exists(figs)
+if (any(fig_exists)) {
+  copied_figs <- file.copy(figs[fig_exists], dest, overwrite = TRUE)
+  message("Copied figures: ", paste(basename(figs[fig_exists][copied_figs]), collapse = ", "))
+}
+if (any(!fig_exists)) {
+  message("Figures not found: ", paste(figs[!fig_exists], collapse = ", "))
+}
+
+# Copy any that exist; warn on missing (tables)
+tab_exists <- file.exists(tables)
+if (any(tab_exists)) {
+  copied_tabs <- file.copy(tables[tab_exists], dest, overwrite = TRUE)
+  message("Copied tables: ", paste(basename(tables[tab_exists][copied_tabs]), collapse = ", "))
+}
+if (any(!tab_exists)) {
+  message("Tables not found: ", paste(tables[!tab_exists], collapse = ", "))
+}
